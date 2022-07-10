@@ -8,10 +8,10 @@ import os
 
 
 def get_device_and_dtype():
-    if torch.cuda.is_available():
-        device = torch.device('cuda')
-    else:
-        device = torch.device('cpu')
+#     if torch.cuda.is_available():
+#         device = torch.device('cuda')
+#     else:
+    device = torch.device('cpu')
     dtype = torch.cuda.sparse.ByteTensor if device.type == 'cuda' else torch.sparse.ByteTensor
     return device, dtype
 
@@ -156,8 +156,10 @@ if __name__ == '__main__':
     print(args)
 
     with open('paths.json', 'r') as f:
-        eICU_path = json.load(f)["eICU_path"]
-        graph_dir = json.load(f)["graph_dir"]
+        json_data = json.load(f)
+        
+    eICU_path = json_data["eICU_path"]
+    graph_dir = json_data["graph_dir"]
 
     device, dtype = get_device_and_dtype()
     adjust = '_adjusted' if args.freq_adjust else ''
