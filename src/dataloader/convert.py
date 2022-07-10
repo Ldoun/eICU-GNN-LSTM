@@ -52,8 +52,11 @@ def convert_into_mmap(data_dir, save_dir, csv_name, n_cols=None, n_rows=100000):
     """
     read csv file and convert flat data into mmap file.
     """
-    csv_to_cols = {'diagnoses': 520, 'diagnoses_1033': 1034, 'labels': 5, 'flat': 58} # including patient column
-    n_cols = (csv_to_cols[csv_name] -1) if n_cols is None else n_cols
+    #csv_to_cols = {'diagnoses': 520, 'diagnoses_1033': 1034, 'labels': 5, 'flat': 94} # including patient column
+    csv_path = Path(data_dir) / 'test' / f'{csv_name}.csv'
+    df = pd.read_csv(csv_path)
+    n_cols = (df.shape[1] -1) if n_cols is None else n_cols
+    #n_cols = (csv_to_cols[csv_name] -1) if n_cols is None else n_cols
     shape = (n_rows, n_cols)
 
     save_path = Path(save_dir) / f'{csv_name}.dat'
