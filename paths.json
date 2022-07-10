@@ -1,7 +1,7 @@
 {
-    "eICU_path": "app/eICU_data/",
-    "log_path": "app/logs/",
-    "data_dir": "app/data/",
-    "graph_dir": "app/graphs/",
-    "ray_dir": "app/ray_results/"
+    "eICU_path": "./data/eICU_data/",
+    "log_path": "./data/logs/",
+    "data_dir": "./data/data/",
+    "graph_dir": "./data/graphs/",
+    "ray_dir": "./data/ray_results/"
 }
