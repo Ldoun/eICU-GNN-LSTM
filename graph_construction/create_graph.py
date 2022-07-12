@@ -41,7 +41,7 @@ def score_matrix(diagnoses, freq_adjustment=None, debug=False):
     return scores
 
 
-def make_graph_penalise(diagnoses, scores, batch_size=1000, debug=True, k=3, mode='k_closest', save_edge_values=True):
+def make_graph_penalise(diagnoses, scores, batch_size=1000, debug=False, k=3, mode='k_closest', save_edge_values=True):
     print('==> Getting edges')
     if debug:
         diagnoses = diagnoses[:1000]
