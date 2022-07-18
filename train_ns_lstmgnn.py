@@ -91,7 +91,7 @@ class Model(pl.LightningModule):
         truth = self.dataset.data.y
         out, out_lstm = self.net.inference(x, flat, edge_weight, self.ts_loader, self.subgraph_loader, self.device) # within this - loop the entire subgraph loader
         truth = truth[self.dataset.data.val_mask].to(self.device)
-        out = out[self.dataset.data.val_mask]
+        out = out[0][self.dataset.data.val_mask]
         out_lstm = out_lstm[self.dataset.data.val_mask]
         loss, loss_lstm, tot_loss = self.add_losses(out, out_lstm, truth)
         results = {
@@ -127,7 +127,7 @@ class Model(pl.LightningModule):
             truth = self.dataset.data.y
             out, out_lstm = self.net.inference(x, flat, edge_weight, self.ts_loader, self.subgraph_loader, self.device) # within this - loop the entire subgraph loader
             truth = truth[self.eval_mask].to(self.device)
-            out = out[self.eval_mask]
+            out = out[0][self.eval_mask]
             out_lstm = out_lstm[self.eval_mask]
             loss, loss_lstm, tot_loss = self.add_losses(out, out_lstm, truth)
             results = {

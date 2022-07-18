@@ -235,10 +235,10 @@ class SamplingGAT(torch.nn.Module):
 
                 xs.append(x)
             x_all = torch.cat(xs, dim=0)
-            if i == 1:
+            if i == 1 and get_attn:
                 edge_index_w_self_loops = torch.cat(edge_index_w_self_loops, dim=1) # [2, n. of edges]
-            
-            edge_attn = torch.cat(edge_attn, dim=0) # [no. of edges, n_heads of that layer]
+            if get_attn:
+                edge_attn = torch.cat(edge_attn, dim=0) # [no. of edges, n_heads of that layer]
 
             all_edge_attn.append(edge_attn)
 
