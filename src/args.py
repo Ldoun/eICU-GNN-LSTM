@@ -321,7 +321,7 @@ def add_configs(config):
             config['gat_heads'] = ([config['gat_n_heads']] * config['gat_layers']) + [config['gat_n_out_heads']]
         if not (config['add_flat'] and (not config['flat_first'])): # i.e directly output class after gnn
             config['gnn_outdim'] = config['out_dim']
-    if (config['model'] == 'lstmgnn' or config['model' == 'transformergnn']) and (not config['dynamic_g']):
+    if (config['model'] == 'lstmgnn' or config['model'] == 'transformergnn') and (not config['dynamic_g']):
         if config['gnn_name'] == 'mpnn':
             config['ns_sizes'] = str(config['ns_size1'])
 
