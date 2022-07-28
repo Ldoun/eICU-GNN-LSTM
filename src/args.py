@@ -95,11 +95,10 @@ def init_arguments():
     return parser
 
 
-def init_lstm_args():
+def init_lstm_args(parser):
     """
     define LSTM-related hyperparams
     """
-    parser = init_arguments()
 
     # shared
     parser.add_argument('--lstm_indim', type=int)
@@ -110,11 +109,10 @@ def init_lstm_args():
     parser.add_argument('--bilstm', action='store_true')
     return parser
 
-def init_transformer_args():
+def init_transformer_args(parser):
     """
     define Transformer-related hyperparams
     """
-    parser = init_arguments()
 
     # shared
     parser.add_argument('--feature_size', type=int, default=34)
@@ -182,8 +180,11 @@ def init_lstmgnn_args():
     """
     define hyperparams for models with LSTM & GNN components (i.e. LSTM-GNNs & dynamic LSTM-GNNs)
     """
-    parser = init_lstm_args()
+    parser = init_arguments()
+    
+    parser = init_lstm_args(parser)
     parser = init_gnn_args(parser)
+    parser = init_transformer_args(parser)
     parser.add_argument('--lg_alpha', type=float, default=1)
     return parser
 
@@ -191,8 +192,11 @@ def init_transformergnn_args():
     """
     define hyperparams for models with Transformer & GNN components 
     """
-    parser = init_transformer_args()
+    parser = init_arguments()
+    
+    parser = init_transformer_args(parser)
     parser = init_gnn_args(parser)
+    parser = init_lstm_args(parser)
     parser.add_argument('--lg_alpha', type=float, default=1)
     return parser
 
