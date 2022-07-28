@@ -37,16 +37,16 @@ class TimeSeriesTransformer(nn.Module):
         output = self.transformer_encoder(src,self.src_mask)#, self.src_mask)
         output = torch.transpose(output, 0, 1).contiguous()
         
-        if self.pooling == 'mean':
+        if self.transformer_pooling == 'mean':
             output = torch.mean(output, 1).squeeze()
-        elif self.pooling == 'max':
+        elif self.transformer_pooling == 'max':
             output = torch.max(output, 1)[0].squeeze()
-        elif self.pooling == 'last':
+        elif self.transformer_pooling == 'last':
             output = output[:, -1, :]
-        elif self.pooling == 'all':
+        elif self.transformer_pooling == 'all':
             pass
         else:
-            raise NotImplementedError('only pooling mean / all for now.')
+            raise NotImplementedError('only transformer_pooling mean / all for now.')
         return output
     
     def _generate_square_subsequent_mask(self, sz):
