@@ -1,3 +1,4 @@
+from turtle import forward
 import torch
 import torch.nn as nn
 from src.models.utils import init_weights, get_act_fn
@@ -24,7 +25,31 @@ def define_transformer_encoder():
 class TimeSeriesTransformer(nn.Module):
     def __init__(self, config):
         super().__init__()
-        self.transformer_pooling = config['transformer_pooling'] # need to apply pooling, trying out with 'ALL'
+        self.device = config['device']
+        self.transformer_pooling = config['transformer_pooling'] 
         self.pos_encoder = PositionalEncoding(config['feature_size'])
-        self.encoder_layer = nn.TransformerEncoderLayer(d_model=config['feature_size'], nhead=config['n_head'], dropout=config['dropout_p'], batch_first=True)
+        self.encoder_layer = nn.TransformerEncoderLayer(d_model=config['feature_size'], nhead=config['n_head'], dropout=config['transformer_dropout'], batch_first=True)
         self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=config['num_layers'])
+        self.init_weights()
+        
+    def forward(self, src):
+        mask = self._generate_square_subsequent_mask(len(src)).to(self.device)
+        self.src_mask = mask
+        src = self.pos_encoder(src)
+        output = self.transformer_encoder(src,self.src_mask)#, self.src_mask)
+        if self.pooling == 'mean':
+            output = torch.mean(output, 1).squeeze()
+        elif self.pooling == 'max':
+            output = torch.max(output, 1)[0].squeeze()
+        elif self.pooling == 'last':
+            output = output[:, -1, :]
+        elif self.pooling == 'all':
+            pass
+        else:
+            raise NotImplementedError('only pooling mean / all for now.')
+        return output
+    
+    def _generate_square_subsequent_mask(self, sz):
+        mask = (torch.triu(torch.ones(sz, sz)) == 1).transpose(0, 1)
+        mask = mask.float().masked_fill(mask == 0, float('-inf')).masked_fill(mask == 1, float(0.0))
+        return mask
