@@ -2,7 +2,7 @@ import argparse
 import torch
 import sys
 from pathlib import Path
-from src.hyperparameters.best_parameters import lstmgnn, dynamic, ns_gnn_default
+from src.hyperparameters.best_parameters import transformergnn, lstmgnn, dynamic, ns_gnn_default
 from src.utils import load_json
 
 def add_best_params(config):
@@ -15,6 +15,8 @@ def add_best_params(config):
         best = dynamic
     elif config['model'] == 'lstmgnn':
         best = lstmgnn
+    elif config['model'] == 'transformergnn':
+        best = transformergnn
     best = best[config['task']][config['gnn_name']]
     for key, value in best.items():
         config[key] = value
@@ -72,7 +74,7 @@ def init_arguments():
 
     # model
     parser.add_argument('--flat_nhid', type=int, default=64)
-    parser.add_argument('--model', type=str, choices=['lstm', 'lstmgnn', 'gnn'], default='lstmgnn')
+    parser.add_argument('--model', type=str, choices=['lstm', 'lstmgnn', 'gnn', 'transformergnn'], default='lstmgnn')
     parser.add_argument('--batch_size', type=int, default=64)
     parser.add_argument('--fc_dim', type=int, default=32)
     parser.add_argument('--main_dropout', type=float, default=0.45)
@@ -106,6 +108,20 @@ def init_lstm_args():
     parser.add_argument('--lstm_pooling', type=str, choices=['all', 'last', 'mean', 'max'], default='last')
     parser.add_argument('--lstm_dropout', type=float, default=0.2)
     parser.add_argument('--bilstm', action='store_true')
+    return parser
+
+def init_transformer_args():
+    """
+    define Transformer-related hyperparams
+    """
+    parser = init_arguments()
+
+    # shared
+    parser.add_argument('--feature_size', type=int, default=34)
+    parser.add_argument('--n_head', type=int, default=2)
+    parser.add_argument('--num_layers', type=int, default=1)
+    parser.add_argument('--transformer_pooling', type=str, choices=['all', 'last', 'mean', 'max'], default='last')
+    parser.add_argument('--transformer_dropout', type=float, default=0.1)
     return parser
 
 
@@ -171,6 +187,15 @@ def init_lstmgnn_args():
     parser.add_argument('--lg_alpha', type=float, default=1)
     return parser
 
+def init_transformergnn_args():
+    """
+    define hyperparams for models with Transformer & GNN components 
+    """
+    parser = init_transformer_args()
+    parser = init_gnn_args(parser)
+    parser.add_argument('--lg_alpha', type=float, default=1)
+    return parser
+
 
 def get_lstm_out_dim(config):
     """
@@ -182,6 +207,17 @@ def get_lstm_out_dim(config):
     else:
         lstm_out_dim = config['lstm_nhid']
     return lstm_out_dim, lstm_last_ts_dim
+
+def get_transformer_out_dim(config):
+    """
+    calculate output dimension of lstm
+    """
+    transformer_last_ts_dim = config['feature_size']
+    if config['transformer_pooling'] == 'all':
+        transformer_out_dim = config['feature_size'] * 24
+    else:
+        transformer_out_dim = config['feature_size']
+    return transformer_out_dim, transformer_last_ts_dim
 
 
 
@@ -265,9 +301,13 @@ def add_configs(config):
 
     # model dimensions
     config['lstm_outdim'], config['lstm_last_ts_dim'] = get_lstm_out_dim(config)
+    config['transformer_outdim'], config['transformer_last_ts_dim'] = get_transformer_out_dim(config)
 
     if config['model'] == 'lstmgnn':
         config['gnn_indim'] = config['lstm_outdim']
+        config['add_last_ts'] = True # true by default
+    if config['model'] == 'transformergnn':
+        config['gnn_indim'] = config['transformer_outdim']
         config['add_last_ts'] = True # true by default
     else:
         config['add_last_ts'] = False
@@ -277,7 +317,7 @@ def add_configs(config):
             config['gat_heads'] = ([config['gat_n_heads']] * config['gat_layers']) + [config['gat_n_out_heads']]
         if not (config['add_flat'] and (not config['flat_first'])): # i.e directly output class after gnn
             config['gnn_outdim'] = config['out_dim']
-    if (config['model'] == 'lstmgnn') and (not config['dynamic_g']):
+    if (config['model'] == 'lstmgnn' or config['model' == 'transformergnn']) and (not config['dynamic_g']):
         if config['gnn_name'] == 'mpnn':
             config['ns_sizes'] = str(config['ns_size1'])
 
@@ -313,6 +353,8 @@ def add_configs(config):
              dir_name = 'whole_' + dir_name
     elif config['model'] == 'lstmgnn':
         dir_name = 'lstm' + config['gnn_name'] + '_alpha' + str(config['lg_alpha'])
+    elif config['model'] == 'transformergnn':
+        dir_name = 'transformer' + config['gnn_name'] + '_alpha' + str(config['lg_alpha'])
     else:
         dir_name = config['model']
 
