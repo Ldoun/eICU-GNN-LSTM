@@ -35,7 +35,7 @@ class Model(pl.LightningModule):
         self.get_emb = get_emb
         self.get_logits = get_logits
         self.get_attn = get_attn
-
+        self.config['device'] = self.device
         self.net = TransformerGNN(self.config)
         
         if chkpt is not None:
