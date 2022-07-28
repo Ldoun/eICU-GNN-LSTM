@@ -24,14 +24,13 @@ def define_transformer_encoder():
 class TimeSeriesTransformer(nn.Module):
     def __init__(self, config):
         super().__init__()
-        self.device = config['device']
         self.transformer_pooling = config['transformer_pooling'] 
         self.pos_encoder = PositionalEncoding(config['feature_size'])
         self.encoder_layer = nn.TransformerEncoderLayer(d_model=config['feature_size'], nhead=config['n_head'], dropout=config['transformer_dropout']) #batch_first=True not possible
         self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=config['num_layers'])
                 
     def forward(self, src):
-        mask = self._generate_square_subsequent_mask(len(src)).to(self.device)
+        mask = self._generate_square_subsequent_mask(len(src)).cuda()
         self.src_mask = mask
         
         src = self.pos_encoder(src)
