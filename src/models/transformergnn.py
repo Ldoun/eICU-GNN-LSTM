@@ -24,9 +24,9 @@ class TransformerGNN(torch.nn.Module):
         init_weights(self.modules())
 
     def forward(self, x, flat, adjs, batch_size, edge_weight):
-        #seq = x.permute(1, 0, 2) no need for permute because of batchfirst
         #x = self.input_layer(x) #change dimension of input to match pos encoder
-        out, _ = self.transformer_encoder.forward(x)
+        seq = x.permute(1, 0, 2)
+        out, _ = self.transformer_encoder.forward(seq)
         last = out[:, -1, :] if len(out.shape)==3 else out
         last = last[:batch_size]
         out = out.view(out.size(0), -1) # all_nodes, transformer_outdim
@@ -43,8 +43,8 @@ class TransformerGNN(torch.nn.Module):
         for inputs, labels, ids in ts_loader:
             seq, flat = inputs
             seq = seq.to(device)
-            #seq = seq.permute(1, 0, 2)
             #seq = self.input_layer(seq)
+            seq = seq.permute(1, 0, 2)
             out, _ = self.transformer_encoder.forward(seq)
             last = out[:, -1, :] if len(out.shape)==3 else out
             out = out.view(out.size(0), -1)
