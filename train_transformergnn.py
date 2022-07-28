@@ -13,7 +13,7 @@ from src.dataloader.pyg_reader import GraphDataset
 from src.models.transformergnn import TransformerGNN
 from src.models.utils import get_checkpoint_path, seed_everything
 from src.metrics import get_loss_function, get_metrics, get_per_node_result
-from src.args import add_configs, init_transformer_args
+from src.args import add_configs, init_transformergnn_args
 from src.utils import write_json, write_pkl
 from torch_geometric.data import NeighborSampler
 from src.dataloader.ts_reader import LstmDataset, collate_fn
@@ -387,7 +387,7 @@ def main_test(hparams, path_results=None):
 
 if __name__ == '__main__':
     # define configs
-    parser = init_transformer_args()
+    parser = init_transformergnn_args()
     parser.add_argument('--fp_emb', action='store_true', help='forward pass to get embeddings')
     parser.add_argument('--fp_logits', action='store_true', help='forward pass to get logits')
     parser.add_argument('--fp_attn', action='store_true', help='forward pass to get attention weights (for GAT)')
