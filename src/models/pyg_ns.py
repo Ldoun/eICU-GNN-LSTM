@@ -30,7 +30,10 @@ def determine_fc_in_dim(config):
     add_lstm = config['add_last_ts']
     flat_dim = config['flat_nhid'] if config['flat_nhid'] is not None else config['num_flat_feats']
     if flat_after and add_lstm:
-        in_dim = config['gnn_outdim'] + flat_dim + config['lstm_last_ts_dim']
+        if config['model'] == 'transformergnn':
+            in_dim = config['gnn_outdim'] + flat_dim + config['transformer_last_ts_dim']
+        else:
+            in_dim = config['gnn_outdim'] + flat_dim + config['lstm_last_ts_dim']
     elif flat_after:
         in_dim = config['gnn_outdim'] + flat_dim
     else:
