@@ -26,7 +26,7 @@ class TransformerGNN(torch.nn.Module):
     def forward(self, x, flat, adjs, batch_size, edge_weight):
         #x = self.input_layer(x) #change dimension of input to match pos encoder
         seq = x.permute(1, 0, 2)
-        out, _ = self.transformer_encoder.forward(seq)
+        out = self.transformer_encoder.forward(seq)
         last = out[:, -1, :] if len(out.shape)==3 else out
         last = last[:batch_size]
         out = out.view(out.size(0), -1) # all_nodes, transformer_outdim
@@ -45,7 +45,7 @@ class TransformerGNN(torch.nn.Module):
             seq = seq.to(device)
             #seq = self.input_layer(seq)
             seq = seq.permute(1, 0, 2)
-            out, _ = self.transformer_encoder.forward(seq)
+            out = self.transformer_encoder.forward(seq)
             last = out[:, -1, :] if len(out.shape)==3 else out
             out = out.view(out.size(0), -1)
             transformer_y = self.last_act(self.transformer_out(last))
