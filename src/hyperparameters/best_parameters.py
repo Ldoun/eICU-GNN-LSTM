@@ -7,6 +7,14 @@ transformergnn = {
             'n_head' : 2,#10
             'transformer_dropout' : 0.1,
             'num_layers' : 1,
+        },
+        'sage':{
+            'batch_size': 128,
+            'lr': 0.000722616,
+            'feature_size' : 34, #or other same as input dimension(input layer will match the featuresize)
+            'n_head' : 2,#10
+            'transformer_dropout' : 0.1,
+            'num_layers' : 1,
         }
     }
 }
