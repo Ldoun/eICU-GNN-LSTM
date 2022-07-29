@@ -124,7 +124,7 @@ class Model(pl.LightningModule):
             flat = self.dataset.data.flat.to(self.device)
             edge_weight = self.dataset.data.edge_attr.to(self.device)
             truth = self.dataset.data.y
-            out, out_lstm = self.net.inference(x, flat, edge_weight, self.ts_loader, self.subgraph_loader, self.device) # within this - loop the entire subgraph loader
+            out, out_lstm = self.net.inference(x, flat, edge_weight, self.ts_loader, self.subgraph_loader, self.device, is_gat=self.config['gnn_name'] == 'gat') # within this - loop the entire subgraph loader
             truth = truth[self.eval_mask].to(self.device)
             out = out[self.eval_mask]
             out_lstm = out_lstm[self.eval_mask]
