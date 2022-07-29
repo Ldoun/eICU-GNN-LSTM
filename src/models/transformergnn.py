@@ -58,7 +58,7 @@ class TransformerGNN(torch.nn.Module):
         print('Got all transformer output.')
         return transformer_outs, lasts, transformer_ys
     
-    def inference(self, x_all, flat_all, edge_weight, ts_loader, subgraph_loader, device, get_emb=False):
+    def inference(self, x_all, flat_all, edge_weight, ts_loader, subgraph_loader, device, get_emb=False, is_gat=False):
         # first collect transformer outputs by minibatching:
         transformer_outs, last_all, transformer_ys = self.infer_transformer_by_batch(ts_loader, device)
 
@@ -67,5 +67,7 @@ class TransformerGNN(torch.nn.Module):
         out = self.gnn_encoder.inference(x_all, flat_all, subgraph_loader, device, edge_weight, last_all, get_emb=get_emb)
 
         out = self.last_act(out)
+        if is_gat:
+            out = out[0]
 
         return out, transformer_ys

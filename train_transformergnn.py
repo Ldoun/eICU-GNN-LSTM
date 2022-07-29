@@ -88,7 +88,7 @@ class Model(pl.LightningModule):
         flat = self.dataset.data.flat.to(self.device)
         edge_weight = self.dataset.data.edge_attr.to(self.device)
         truth = self.dataset.data.y
-        out, out_lstm = self.net.inference(x, flat, edge_weight, self.ts_loader, self.subgraph_loader, self.device) # within this - loop the entire subgraph loader
+        out, out_lstm = self.net.inference(x, flat, edge_weight, self.ts_loader, self.subgraph_loader, self.device, is_gat=self.config['gnn_name'] == 'gat') # within this - loop the entire subgraph loader
         truth = truth[self.dataset.data.val_mask].to(self.device)
         out = out[self.dataset.data.val_mask]
         out_lstm = out_lstm[self.dataset.data.val_mask]
@@ -115,9 +115,9 @@ class Model(pl.LightningModule):
                 results = {'hid': out, 'edge_index': edge_index_w_self_loops, 'edge_attn_1': all_edge_attn[0], 'edge_attn_2': all_edge_attn[1]}
             else:
                 if self.get_logits:
-                    out, out_lstm = self.net.inference(x, flat, edge_weight, self.ts_loader, self.subgraph_loader, self.device) # within this - loop the entire subgraph loader
+                    out, out_lstm = self.net.inference(x, flat, edge_weight, self.ts_loader, self.subgraph_loader, self.device, is_gat=self.config['gnn_name'] == 'gat') # within this - loop the entire subgraph loader
                 else:
-                    out, out_lstm = self.net.inference(x, flat, edge_weight, self.ts_loader, self.subgraph_loader, self.device, get_emb=True)
+                    out, out_lstm = self.net.inference(x, flat, edge_weight, self.ts_loader, self.subgraph_loader, self.device, get_emb=True, is_gat=self.config['gnn_name'] == 'gat')
                 results = {'hid': out}
         else:
             x = self.dataset.data.x.to(self.device)
