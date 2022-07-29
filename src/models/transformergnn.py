@@ -12,7 +12,7 @@ class TransformerGNN(torch.nn.Module):
     """
     def __init__(self, config):
         super().__init__()
-        #self.input_layer = nn.Linear(config['input_size'], config['feature_size'])
+        self.input_layer = nn.Linear(config['input_size'], config['feature_size'])
         self.transformer_encoder = define_transformer_encoder()(config)        
         self.gnn_name = config['gnn_name']
         self.gnn_encoder = define_ns_gnn_encoder(config['gnn_name'])(config)
@@ -24,7 +24,7 @@ class TransformerGNN(torch.nn.Module):
         init_weights(self.modules())
 
     def forward(self, x, flat, adjs, batch_size, edge_weight):
-        #x = self.input_layer(x) #change dimension of input to match pos encoder
+        x = self.input_layer(x) #change dimension of input to match pos encoder
         seq = x.permute(1, 0, 2)
         out = self.transformer_encoder.forward(seq)
         last = out[:, -1, :] if len(out.shape)==3 else out
@@ -43,7 +43,7 @@ class TransformerGNN(torch.nn.Module):
         for inputs, labels, ids in ts_loader:
             seq, flat = inputs
             seq = seq.to(device)
-            #seq = self.input_layer(seq)
+            seq = self.input_layer(seq)
             seq = seq.permute(1, 0, 2)
             out = self.transformer_encoder.forward(seq)
             last = out[:, -1, :] if len(out.shape)==3 else out

@@ -120,6 +120,7 @@ def init_transformer_args(parser):
     parser.add_argument('--num_layers', type=int, default=1)
     parser.add_argument('--transformer_pooling', type=str, choices=['all', 'last', 'mean', 'max'], default='last')
     parser.add_argument('--transformer_dropout', type=float, default=0.1)
+    parser.add_argument('--input_size', type=int, default=34)
     return parser
 
 
