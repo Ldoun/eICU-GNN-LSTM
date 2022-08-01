@@ -32,5 +32,6 @@ if __name__ == '__main__':
     parser = init_transformergnn_args()
     parser = add_tune_params(parser)
     config = parser.parse_args()
+    config.model = 'transformergnn'
     config = add_configs(config)
     main_tune(main_train, config)
