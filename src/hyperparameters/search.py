@@ -109,7 +109,7 @@ def main_tune(tune_function, config):
             config[key] = value
             parameter_columns.append(key)
 
-    elif 'transformer' in config['model']:
+    if 'transformer' in config['model']:
         for key, value in transformer_grid.items():
             config[key] = value
             parameter_columns.append(key)
