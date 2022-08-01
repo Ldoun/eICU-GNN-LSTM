@@ -38,6 +38,12 @@ nsgnn_grid = {
     "lg_alpha": tune.loguniform(0.5, 3),
 }
 
+transformer_grid = {
+    "feature_size": tune.choice([50,100,150,200,250]),
+    "n_head": tune.choice([1,2,5,10]),
+    "transformer_dropout": tune.uniform(0, 0.5),
+    "num_layers": tune.choice([1,2,3,4,5]),
+}
 
 gnn_specific_grid = {
     'sage': 
@@ -103,7 +109,12 @@ def main_tune(tune_function, config):
             config[key] = value
             parameter_columns.append(key)
 
-    if config['fix_g_params'] or config['fix_l_params']:
+    elif 'transformer' in config['model']:
+        for key, value in transformer_grid.items():
+            config[key] = value
+            parameter_columns.append(key)
+
+    if config['fix_g_params'] or config['fix_l_params']: #fix params
         if config['dynamic_g']:
             best_params = dynamic[config['task']][config['gnn_name']]
         elif config['model'] == 'lstmgnn':
@@ -161,4 +172,3 @@ def main_tune(tune_function, config):
         num_samples=config['num_samples'],
         scheduler=scheduler,
         progress_reporter=reporter)
-
