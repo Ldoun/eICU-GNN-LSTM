@@ -215,7 +215,7 @@ def get_lstm_out_dim(config):
 
 def get_transformer_out_dim(config):
     """
-    calculate output dimension of lstm
+    calculate output dimension of transformer
     """
     transformer_last_ts_dim = config['feature_size']
     if config['transformer_pooling'] == 'all':
