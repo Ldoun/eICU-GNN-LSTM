@@ -3,8 +3,7 @@ os.environ["SLURM_JOB_NAME"] = "bash"
 import pytorch_lightning as pl
 from train_transformergnn import get_data, Model
 from src.hyperparameters.search import ihm_TuneReportCallback, los_TuneReportCallback, main_tune
-from src.args import init_transformergnn_args, add_tune_params, add_configs
-
+from src.args import init_transformergnn_args, add_tune_params, add_configs, get_transformer_out_dim
 
 def main_train(config):
     dataset, train_loader, subgraph_loader = get_data(config)
@@ -13,6 +12,9 @@ def main_train(config):
     model = Model(config, dataset, train_loader, subgraph_loader)
 
     trcb = [ihm_TuneReportCallback()] if config['task'] == 'ihm' else [los_TuneReportCallback()]
+    config['transformer_outdim'], config['transformer_last_ts_dim'] = get_transformer_out_dim(config)
+    config['gnn_indim'] = config['transformer_outdim']
+
 
     trainer = pl.Trainer(
         gpus=config['gpus'],
