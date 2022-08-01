@@ -7,14 +7,13 @@ from src.args import init_transformergnn_args, add_tune_params, add_configs, get
 
 def main_train(config):
     dataset, train_loader, subgraph_loader = get_data(config)
+    config['transformer_outdim'], config['transformer_last_ts_dim'] = get_transformer_out_dim(config)
+    config['gnn_indim'] = config['transformer_outdim']
 
     # define model
     model = Model(config, dataset, train_loader, subgraph_loader)
 
     trcb = [ihm_TuneReportCallback()] if config['task'] == 'ihm' else [los_TuneReportCallback()]
-    config['transformer_outdim'], config['transformer_last_ts_dim'] = get_transformer_out_dim(config)
-    config['gnn_indim'] = config['transformer_outdim']
-
 
     trainer = pl.Trainer(
         gpus=config['gpus'],
