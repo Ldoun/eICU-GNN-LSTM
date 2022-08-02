@@ -28,7 +28,7 @@ class los_TuneReportCallback(Callback):
 
 
 all_grid = {
-    'batch_size': tune.choice([32, 64, 128]),
+    #'batch_size': tune.choice([32, 64, 128]),
     'lr': tune.loguniform(5e-4, 1e-3),
     'l2': tune.loguniform(1e-5, 1e-3),
     'main_dropout': tune.uniform(0, 0.5)
@@ -85,7 +85,7 @@ gnn_specific_grid = {
 
 
 def main_tune(tune_function, config):
-    parameter_columns = ['batch_size', 'lr', 'l2', 'main_dropout']
+    parameter_columns = ['lr', 'l2', 'main_dropout']
 
     for key, value in all_grid.items():
         config[key] = value
