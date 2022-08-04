@@ -34,6 +34,23 @@ transformergnn = {
             'sage_nhid': 64,
             'lg_alpha': 1.0312958073093499
         }
+    },
+    'los':{
+        'sage':{
+            'batch_size':64,
+            'main_dropout': 0.018763987886398326,
+            'l2': 1.7540734400960717e-05,
+            'lr': 0.0005683331164119488,
+            'feature_size': 50,
+            'n_head': 5,
+            'num_layers': 5,
+            'transformer_dropout': 0.11846821049739797,
+            'ns_size1': 30,
+            'ns_size2': 30,
+            'gnn_outdim': 512,
+            'sage_nhid': 128,
+            'lg_alpha': 0.8764353421678084
+        }
     }
 }
 
