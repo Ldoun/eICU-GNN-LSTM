@@ -277,6 +277,9 @@ def add_configs(config):
     add in additional configs
     """
     config = vars(config)
+    
+    if config['read_best']:
+        add_best_params(config)
 
     config['verbose'] = False
     config['ns_sizes'] = str(config['ns_size1'] + config['ns_size2']) + '_' + str(config['ns_size1'])
@@ -348,8 +351,6 @@ def add_configs(config):
     if 'config_file' in config:
         read_params_from_file(config)
 
-    if config['read_best']:
-        add_best_params(config)
 
     # define log path
     if config['model'] == 'gnn':
