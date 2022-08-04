@@ -108,3 +108,5 @@ local_log
 graphs
 lightning_logs
 preprocessing.ipynb
+*.json
+eda.ipynb

@@ -1,20 +1,38 @@
 transformergnn = {
     'ihm':{
         'gat':{
-            'batch_size': 128,
-            'lr': 0.000722616,
-            'feature_size' : 34, #or other same as input dimension(input layer will match the featuresize)
-            'n_head' : 2,#10
-            'transformer_dropout' : 0.1,
-            'num_layers' : 1,
+            'batch_size': 32,
+            'main_dropout': 0.18372008211235852,
+            'l2': 4.727127664357186e-05,
+            'lr': 0.0008718315928321795,
+            'feature_size': 50,
+            'n_head': 5,
+            'num_layers': 1,
+            'transformer_dropout': 0.03064803347431516,
+            'ns_size1': 20,
+            'ns_size2': 10,
+            'gnn_outdim': 256,
+            'gat_nhid': 128,
+            'gat_n_heads': 8,
+            'gat_n_out_heads': 6,
+            'gat_featdrop': 0.5544636624539934,
+            'gat_attndrop': 0.36752089325000625,
+            'lg_alpha': 0.8021371796064966
         },
         'sage':{
-            'batch_size': 128,
-            'lr': 0.000722616,
-            'feature_size' : 34, #or other same as input dimension(input layer will match the featuresize)
-            'n_head' : 2,#10
-            'transformer_dropout' : 0.1,
-            'num_layers' : 1,
+            'batch_size': 64,
+            'main_dropout': 0.4764078276366299,
+            'l2': 3.8467391582718036e-05,
+            'lr': 0.0006620594243333216,
+            'feature_size': 100,
+            'n_head': 5,
+            'num_layers': 1,
+            'transformer_dropout': 0.15462010156813683,
+            'ns_size1': 5,
+            'ns_size2': 10,
+            'gnn_outdim': 64,
+            'sage_nhid': 64,
+            'lg_alpha': 1.0312958073093499
         }
     }
 }
