@@ -1,3 +1,4 @@
+import numpy as np
 from tqdm import tqdm
 import torch
 import torch.nn as nn
@@ -58,9 +59,44 @@ class TransformerGNN(torch.nn.Module):
         print('Got all transformer output.')
         return transformer_outs, lasts, transformer_ys
     
-    def inference(self, x_all, flat_all, edge_weight, ts_loader, subgraph_loader, device, get_emb=False, is_gat=False):
+    def infer_transformer_by_batch_attn(self, ts_loader, device):
+        transformer_outs = []
+        lasts = []
+        transformer_ys = []
+        transformer_input = np.array()
+        attentions = np.array()
+
+        def hook(m, i, o):
+            attentions.append(o.detach().cpu().numpy())
+
+        for encoder_layer in self.transformer_encoder.transformer_encoder.layers:
+            encoder_layer.self_attn.register_forward_hook(hook)
+
+        for inputs, labels, ids in ts_loader:
+            seq, flat = inputs
+            transformer_input.append(seq.detach().cpu().numpy())
+            seq = seq.to(device)
+            seq = self.input_layer(seq)
+            seq = seq.permute(1, 0, 2)
+            out = self.transformer_encoder.forward(seq)
+            last = out[:, -1, :] if len(out.shape)==3 else out
+            out = out.view(out.size(0), -1)
+            transformer_y = self.last_act(self.transformer_out(last))
+            transformer_outs.append(out)
+            lasts.append(last)
+            transformer_ys.append(transformer_y)
+        transformer_outs = torch.cat(transformer_outs, dim=0) # [entire_g, dim]
+        lasts = torch.cat(lasts, dim=0) # [entire_g, dim]
+        transformer_ys = torch.cat(transformer_ys, dim=0)
+        print('Got all transformer output.')
+        return transformer_outs, lasts, transformer_ys, (transformer_input, attentions)
+
+    def inference(self, x_all, flat_all, edge_weight, ts_loader, subgraph_loader, device, get_emb=False, is_gat=False, get_attention = False):
         # first collect transformer outputs by minibatching:
-        transformer_outs, last_all, transformer_ys = self.infer_transformer_by_batch(ts_loader, device)
+        if get_attention:
+            transformer_outs, last_all, transformer_ys, input_with_attention = self.infer_transformer_by_batch_attn(ts_loader, device)
+        else:
+            transformer_outs, last_all, transformer_ys = self.infer_transformer_by_batch(ts_loader, device)
 
         # then pass transformer outputs to gnn
         x_all = transformer_outs
@@ -71,3 +107,4 @@ class TransformerGNN(torch.nn.Module):
             out = out[0]
 
         return out, transformer_ys
+
