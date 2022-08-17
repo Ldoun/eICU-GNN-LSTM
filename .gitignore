@@ -110,3 +110,4 @@ lightning_logs
 preprocessing.ipynb
 *.json
 eda.ipynb
+additional_data

@@ -16,7 +16,7 @@ def reconfigure_timeseries(timeseries, offset_column, feature_column=None, test=
     return timeseries
 
 def resample_and_mask(timeseries, eICU_path, header, mask_decay=True, decay_rate = 4/3, test=False,
-                       verbose=False):
+                       verbose=False, time_window='H'):
     if verbose:
         print('Resampling to 1 hour intervals...')
     # take the mean of any duplicate index entries for unstacking
@@ -24,8 +24,8 @@ def resample_and_mask(timeseries, eICU_path, header, mask_decay=True, decay_rate
     # put patient into columns so that we can round the timedeltas to the nearest hour and take the mean in the time interval
     unstacked = timeseries.unstack(level=0)
     del (timeseries)
-    unstacked.index = unstacked.index.ceil(freq='H')
-    resampled = unstacked.resample('H', closed='right', label='right').mean()
+    unstacked.index = unstacked.index.ceil(freq=time_window)
+    resampled = unstacked.resample(time_window, closed='right', label='right').mean()
     del (unstacked)
 
     # store which values had to be imputed
@@ -86,7 +86,7 @@ def gen_patient_chunk(patients, merged, size=500):
         yield merged.loc[chunk]
         chunk = list(itertools.islice(it, size))
 
-def gen_timeseries_file(eICU_path, test=False):
+def gen_timeseries_file(eICU_path, test=False, time_window='H'):
 
     print('==> Loading data from timeseries files...')
     timeseries_lab = pd.read_csv(eICU_path + 'timeserieslab.csv')
@@ -142,7 +142,7 @@ def gen_timeseries_file(eICU_path, test=False):
     print('==> Initiating main processing loop...')
     for patient_chunk in gen_chunks:
         resample_and_mask(patient_chunk, eICU_path, header, mask_decay=True, decay_rate=4/3,
-                           test=test, verbose=False)
+                           test=test, verbose=False, time_window=time_window)
         print('==> Processed ' + str(i) + ' patients...')
         i += 500
         header = False
@@ -197,7 +197,7 @@ def further_processing(eICU_path, test=False):
 
     return
 
-def timeseries_main(eICU_path, test=False):
+def timeseries_main(eICU_path, test=False, time_window='H'):
     # make sure the preprocessed_timeseries.csv file is not there because the first section of this script appends to it
     print('==> Removing the preprocessed_timeseries.csv file if it exists...')
     try:
@@ -205,7 +205,7 @@ def timeseries_main(eICU_path, test=False):
 
     except FileNotFoundError:
         pass
-    gen_timeseries_file(eICU_path, test)
+    gen_timeseries_file(eICU_path, test, time_window=time_window)
     further_processing(eICU_path, test)
     return
 
