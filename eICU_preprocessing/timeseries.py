@@ -2,6 +2,7 @@ import pandas as pd
 import itertools
 import numpy as np
 import os
+import gc
 
 
 def reconfigure_timeseries(timeseries, offset_column, feature_column=None, test=False):
@@ -18,7 +19,7 @@ def reconfigure_timeseries(timeseries, offset_column, feature_column=None, test=
 def resample_and_mask(timeseries, eICU_path, header, mask_decay=True, decay_rate = 4/3, test=False,
                        verbose=False, time_window='H'):
     if verbose:
-        print('Resampling to 1 hour intervals...')
+        print(f'Resampling to {time_window} intervals...')
     # take the mean of any duplicate index entries for unstacking
     timeseries = timeseries.groupby(level=[0, 1]).mean()
     # put patient into columns so that we can round the timedeltas to the nearest hour and take the mean in the time interval
@@ -27,6 +28,7 @@ def resample_and_mask(timeseries, eICU_path, header, mask_decay=True, decay_rate
     unstacked.index = unstacked.index.ceil(freq=time_window)
     resampled = unstacked.resample(time_window, closed='right', label='right').mean()
     del (unstacked)
+    gc.collect()
 
     # store which values had to be imputed
     if mask_decay:
@@ -124,9 +126,14 @@ def gen_timeseries_file(eICU_path, test=False, time_window='H'):
 
     print('==> Combining data together...')
     merged = timeseries_lab.append(timeseries_resp, sort=False)
+    del timeseries_resp, timeseries_lab
+    gc.collect()
     merged = merged.append(timeseries_periodic, sort=False)
+    del timeseries_periodic
+    gc.collect()
     merged = merged.append(timeseries_aperiodic, sort=True)
-
+    del timeseries_aperiodic
+    gc.collect()
     print('==> Normalising...')
     # all if not all are not normally distributed
     quantiles = merged.quantile([0.05, 0.95])
