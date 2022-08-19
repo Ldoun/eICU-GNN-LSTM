@@ -63,8 +63,8 @@ class TransformerGNN(torch.nn.Module):
         transformer_outs = []
         lasts = []
         transformer_ys = []
-        transformer_input = np.array()
-        attentions = np.array()
+        transformer_input = []
+        attentions = []
 
         def hook(m, i, o):
             attentions.append(o.detach().cpu().numpy())
@@ -89,7 +89,7 @@ class TransformerGNN(torch.nn.Module):
         lasts = torch.cat(lasts, dim=0) # [entire_g, dim]
         transformer_ys = torch.cat(transformer_ys, dim=0)
         print('Got all transformer output.')
-        return transformer_outs, lasts, transformer_ys, (transformer_input, attentions)
+        return transformer_outs, lasts, transformer_ys, (np.stack(transformer_input), np.stack(attentions))
 
     def inference(self, x_all, flat_all, edge_weight, ts_loader, subgraph_loader, device, get_emb=False, is_gat=False, get_attention = False):
         # first collect transformer outputs by minibatching:
