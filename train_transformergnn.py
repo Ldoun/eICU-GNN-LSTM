@@ -212,7 +212,7 @@ class Model(pl.LightningModule):
         print(f'Loading model {model_path.parent.stem}')
         args = {'config': dict(config), 'dataset': dataset, \
             'train_loader': train_loader, 'subgraph_loader': subgraph_loader}
-        model = Model.load_from_checkpoint(checkpoint_path=str(model_path), **args)
+        model = Model.load_from_checkpoint(checkpoint_path=str(model_path), kwagrs=dict(args))
 
         return model, config, dataset, train_loader, subgraph_loader
 
