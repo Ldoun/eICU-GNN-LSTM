@@ -183,7 +183,7 @@ class Model(pl.LightningModule):
             sch = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=10)
         else:
             sch = torch.optim.lr_scheduler.ReduceLROnPlateau(opt, factor=0.5, patience=2)
-        return {'optimizer': opt, 'lr_scheduler':sch}
+        return [opt], [sch]
     
     def train_dataloader(self):
         return self.batch_loader
