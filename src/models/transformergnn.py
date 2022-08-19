@@ -106,5 +106,8 @@ class TransformerGNN(torch.nn.Module):
         if is_gat:
             out = out[0]
 
+        if get_attention:
+            return input_with_attention
+
         return out, transformer_ys
 

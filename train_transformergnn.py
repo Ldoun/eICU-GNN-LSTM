@@ -35,6 +35,7 @@ class Model(pl.LightningModule):
         self.get_emb = get_emb
         self.get_logits = get_logits
         self.get_attn = get_attn
+        self.get_attn_transformer = False
         self.net = TransformerGNN(self.config)
         
         if chkpt is not None:
@@ -103,7 +104,7 @@ class Model(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         # there's just one step for the test step:
         # - we're not using batch / batch_idx (it's just dummy)
-        if self.get_emb or self.get_logits:
+        if self.get_emb or self.get_logits or self.get_attn_transformer:
             x = self.dataset.data.x.to(self.device)
             flat = self.dataset.data.flat.to(self.device)
             edge_weight = self.dataset.data.edge_attr.to(self.device)
@@ -113,6 +114,12 @@ class Model(pl.LightningModule):
                 out, out_lstm, edge_index_w_self_loops, all_edge_attn = self.net.inference_w_attn(x, flat, edge_weight, edge_index, self.ts_loader, self.subgraph_loader, self.device)
                 # out, out_lstm, edge_index_w_self_loops, all_edge_attn = self.net.inference_w_attn(x, flat, edge_weight, self.ts_loader, self.subgraph_loader, self.device)
                 results = {'hid': out, 'edge_index': edge_index_w_self_loops, 'edge_attn_1': all_edge_attn[0], 'edge_attn_2': all_edge_attn[1]}
+            
+            elif self.get_attn_transformer:
+                transformer_input, attentions = self.net.inference(x, flat, edge_weight, self.ts_loader, self.subgraph_loader, self.device, is_gat=self.config['gnn_name'] == 'gat', get_attention=True)
+                
+                results = {'transformer_input': transformer_input, 'attentions': attentions}
+
             else:
                 if self.get_logits:
                     out, out_lstm = self.net.inference(x, flat, edge_weight, self.ts_loader, self.subgraph_loader, self.device, is_gat=self.config['gnn_name'] == 'gat') # within this - loop the entire subgraph loader
@@ -150,7 +157,7 @@ class Model(pl.LightningModule):
 
     def test_epoch_end(self, outputs):
         collect_dict = self.collect_outputs(outputs)
-        if self.get_emb or self.get_logits or self.get_attn:
+        if self.get_emb or self.get_logits or self.get_attn or self.get_attn_transformer:
             results = collect_dict
         else:
             log_dict_1 = self.compute_metrics(collect_dict['truth'], collect_dict['pred'])
@@ -339,6 +346,39 @@ def main_forward_pass(hparams):
                 np.save(f, dat)
             print('saved at', out_path)
 
+def main_forward_pass_transformer(hparams):
+    """
+    Main function to load a trained model and execute a forward pass to get logits, embeddings and attention weights for analysis.
+    """
+    log_dir = hparams['load']
+    model, config, dataset, train_loader, subgraph_loader = Model.load_model(log_dir, \
+            data_dir=hparams['data_dir'], graph_dir=hparams['graph_dir'], \
+            multi_gpu=hparams['multi_gpu'], num_workers=hparams['num_workers'])
+    
+    model.get_attn_transformer = True
+
+    trainer = pl.Trainer(
+        gpus=hparams['gpus'],
+        logger=None,
+        max_epochs=hparams['epochs'],
+        default_root_dir=hparams['log_path'],
+        deterministic=True
+    )
+
+    import numpy as np
+    test_results = trainer.test(model)
+
+    # logits / hidden vector
+    name1 = 'transformer' + config['gnn_name'] + '_input.npy'
+    name2 = 'transformer' + config['gnn_name'] + '_attention.npy'
+    
+    with open(Path(log_dir)/name1, 'wb') as f:
+        np.save(f, test_results[0])
+    with open(Path(log_dir)/name2, 'wb') as f:
+        np.save(f, test_results)
+    print('saved at', log_dir)
+
+
 
 
 def main_test(hparams, path_results=None):
@@ -390,6 +430,7 @@ if __name__ == '__main__':
     parser.add_argument('--fp_emb', action='store_true', help='forward pass to get embeddings')
     parser.add_argument('--fp_logits', action='store_true', help='forward pass to get logits')
     parser.add_argument('--fp_attn', action='store_true', help='forward pass to get attention weights (for GAT)')
+    parser.add_argument('--fp_attn_transformer', action='store_true', help='forward pass to get attention weights (for Transforemer)')
     config = parser.parse_args()
     config.model = 'transformergnn'
     config = add_configs(config)
@@ -401,6 +442,9 @@ if __name__ == '__main__':
     if config['fp_emb'] or config['fp_logits'] or config['fp_attn']:
         main_forward_pass(config)
     
+    if config['fp_attn_transformer']:
+        main_forward_pass_transformer(config)
+
     if config['test']:
         main_test(config)
     
