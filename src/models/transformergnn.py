@@ -67,7 +67,7 @@ class TransformerGNN(torch.nn.Module):
         attentions = []
 
         def hook(m, i, o):
-            attentions.append(o.detach().cpu().numpy())
+            attentions.append(o[1].detach().cpu().numpy())
 
         for encoder_layer in self.transformer_encoder.transformer_encoder.layers:
             encoder_layer.self_attn.register_forward_hook(hook)
