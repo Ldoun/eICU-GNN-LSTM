@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
-from src.models.utils import init_weights, get_act_fn
+from src.models.utils import init_weights, get_act_fn, trunc_normal_
 import math
-from utils import trunc_normal_
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, max_len=5000):
