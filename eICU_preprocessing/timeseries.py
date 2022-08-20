@@ -20,6 +20,10 @@ def resample_and_mask(timeseries, eICU_path, header, mask_decay=True, decay_rate
                        verbose=False, time_window='H'):
     if verbose:
         print(f'Resampling to {time_window} intervals...')
+    if time_window == '20min':
+        freq = 3
+    elif time_window == 'H':
+        freq = 1
     # take the mean of any duplicate index entries for unstacking
     timeseries = timeseries.groupby(level=[0, 1]).mean()
     # put patient into columns so that we can round the timedeltas to the nearest hour and take the mean in the time interval
@@ -41,22 +45,22 @@ def resample_and_mask(timeseries, eICU_path, header, mask_decay=True, decay_rate
         count_non_measurements = inv_mask_bool.cumsum() - \
                                  inv_mask_bool.cumsum().where(mask_bool).ffill().fillna(0)
         mask = mask.ffill().fillna(0) / (count_non_measurements * decay_rate).replace(0, 1)
-        mask = mask.iloc[-24:]
+        mask = mask.iloc[-24*freq:]
         del (mask_bool, inv_mask_bool, count_non_measurements)
     else:
         if verbose:
             print('Calculating binary mask features...')
-        mask = resampled.iloc[-24:].notnull()
+        mask = resampled.iloc[-24*freq:].notnull()
         mask = mask.astype(int)
 
     if verbose:
         print('Filling missing data forwards...')
     # carry forward missing values (note they will still be 0 in the nulls table)
-    resampled = resampled.fillna(method='ffill').iloc[-24:]
+    resampled = resampled.fillna(method='ffill').iloc[-24*freq:]
 
     # simplify the indexes of both tables
-    resampled.index = list(range(1, 25))
-    mask.index = list(range(1, 25))
+    resampled.index = list(range(1, (24*freq)+1))
+    mask.index = list(range(1, (24*freq)+1))
 
     if verbose:
         print('Filling in remaining values with zeros...')
@@ -156,17 +160,17 @@ def gen_timeseries_file(eICU_path, test=False, time_window='H'):
 
     return
 
-def add_time_of_day(processed_timeseries, flat_features):
+def add_time_of_day(processed_timeseries, flat_features,freq=1):
 
     print('==> Adding time of day features...')
     processed_timeseries = processed_timeseries.join(flat_features[['hour']], how='inner', on='patient')
     processed_timeseries['hour'] = processed_timeseries['time'] + processed_timeseries['hour']
-    hour_list = np.linspace(0,1,24)  # make sure it's still scaled well
-    processed_timeseries['hour'] = processed_timeseries['hour'].apply(lambda x: hour_list[x - 24])
+    hour_list = np.linspace(0,1,24*freq)  # make sure it's still scaled well
+    processed_timeseries['hour'] = processed_timeseries['hour'].apply(lambda x: hour_list[x - 24*freq]) #not changing column hour to 20min
     return processed_timeseries
 
-def further_processing(eICU_path, test=False):
-
+def further_processing(eICU_path, test=False,time_window='H'):
+    freq = 3 if time_window=='20min' else 1
     processed_timeseries = pd.read_csv(eICU_path + 'preprocessed_timeseries.csv')
     processed_timeseries.rename(columns={'Unnamed: 1': 'time'}, inplace=True)
     processed_timeseries.set_index('patient', inplace=True)
@@ -174,7 +178,7 @@ def further_processing(eICU_path, test=False):
     flat_features.rename(columns={'patientunitstayid': 'patient'}, inplace=True)
     flat_features.set_index('patient', inplace=True)
 
-    processed_timeseries = add_time_of_day(processed_timeseries, flat_features)
+    processed_timeseries = add_time_of_day(processed_timeseries, flat_features,freq=freq)
 
     print('==> Getting rid of time series that don\'t vary across time for at least 30% patients '
           '- these will be added to the flat features instead of time series...')
@@ -182,12 +186,12 @@ def further_processing(eICU_path, test=False):
     mask_cols = [col for col in processed_timeseries.columns if 'mask' in col]
     # we say equals 1 in case mask decay is being used
     mean_masks = processed_timeseries[mask_cols].eq(1).groupby('patient').mean().mean()
-    mask_to_flat = list(mean_masks[(mean_masks <= 2 / 24)].index)
+    mask_to_flat = list(mean_masks[(mean_masks <= 2 / 24*freq)].index)
     cols_to_flat = [x[:-5] for x in mask_to_flat] + mask_to_flat  # remove '_mask'
 
     # keep only the most recent measurement, and it's corresponding mask value
     flat_features = flat_features.join(
-        processed_timeseries.loc[processed_timeseries['time'] == 24][cols_to_flat],
+        processed_timeseries.loc[processed_timeseries['time'] == 24*freq][cols_to_flat],
         how='inner', on='patient')
     processed_timeseries.drop(cols_to_flat, axis=1, inplace=True)
 
@@ -213,7 +217,7 @@ def timeseries_main(eICU_path, test=False, time_window='H'):
     except FileNotFoundError:
         pass
     gen_timeseries_file(eICU_path, test, time_window=time_window)
-    further_processing(eICU_path, test)
+    further_processing(eICU_path, test, time_window=time_window)
     return
 
 if __name__=='__main__':
