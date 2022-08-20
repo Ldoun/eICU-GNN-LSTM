@@ -196,8 +196,11 @@ def further_processing(eICU_path, test=False,time_window='H'):
     processed_timeseries.drop(cols_to_flat, axis=1, inplace=True)
 
     # remove RR (patient) as it has hardly any entries and we already have respiration as a feature
-    processed_timeseries.drop(columns=['RR (patient)', 'RR (patient)_mask'], inplace=True)
-
+    try:
+        processed_timeseries.drop(columns=['RR (patient)', 'RR (patient)_mask'], inplace=True)
+    except KeyError as e:
+        print(e)
+        
     if test is False:
         print('==> Saving flat features with non-time varying features added...')
         flat_features.to_csv(eICU_path + 'preprocessed_flat.csv')
