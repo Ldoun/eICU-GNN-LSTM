@@ -4,7 +4,7 @@ from pathlib import Path
 from src.utils import write_json, write_pkl, load_json
 
 
-def convert_timeseries_into_mmap(data_dir, save_dir, n_rows=100000):
+def convert_timeseries_into_mmap(data_dir, save_dir, n_rows=100000, freq=1):
     """
     read csv file and convert time series data into mmap file.
     """
@@ -21,7 +21,7 @@ def convert_timeseries_into_mmap(data_dir, save_dir, n_rows=100000):
         csv_path = Path(data_dir) / split / 'timeseries.csv'
         df = pd.read_csv(csv_path)
         arr = df.values
-        new = np.reshape(arr, (-1, 24, 35))
+        new = np.reshape(arr, (-1, 24*freq, 35))
         pos_to_id = new[:, 0, 0]
         ids.append(pos_to_id)
         new = new[:, :, 1:] # no patient column
@@ -98,12 +98,15 @@ if __name__ == '__main__':
     paths = load_json('paths.json')
     data_dir = paths['eICU_path']
     save_dir = paths['data_dir']
+    time_window = "20min"
+    freq = 3 if time_window == "20min" else 1
+    print(f'using {time_window} time_window data')
     print(f'Load eICU processed data from {data_dir}')
     print(f'Saving mmap data in {save_dir}')
     print('--'*30)
     Path(save_dir).mkdir(exist_ok=True)
     print('** Converting time series **')
-    convert_timeseries_into_mmap(data_dir, save_dir)
+    convert_timeseries_into_mmap(data_dir, save_dir,freq=freq)
     for csv_name in ['flat', 'diagnoses', 'labels']:
         print(f'** Converting {csv_name} **')
         convert_into_mmap(data_dir, save_dir, csv_name)
