@@ -98,7 +98,7 @@ if __name__ == '__main__':
     paths = load_json('paths.json')
     data_dir = paths['eICU_path']
     save_dir = paths['data_dir']
-    time_window = "20min"
+    time_window = "20min" # change if you use 1 hour time window
     freq = 3 if time_window == "20min" else 1
     print(f'using {time_window} time_window data')
     print(f'Load eICU processed data from {data_dir}')
