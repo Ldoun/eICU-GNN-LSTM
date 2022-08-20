@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from src.models.utils import init_weights, get_act_fn
 import math
+from utils import trunc_normal_
 
 class PositionalEncoding(nn.Module):
     def __init__(self, d_model, max_len=5000):
@@ -26,13 +27,15 @@ class TimeSeriesTransformer(nn.Module):
         super().__init__()
         self.transformer_pooling = config['transformer_pooling'] 
         self.pos_encoder = PositionalEncoding(config['feature_size'])
+        self.cls_token = trunc_normal_(nn.Parameter(torch.zeros(1, 1, config['feature_size'])))
         self.encoder_layer = nn.TransformerEncoderLayer(d_model=config['feature_size'], nhead=config['n_head'], dropout=config['transformer_dropout']) #batch_first=True not possible
         self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=config['num_layers'])
                 
     def forward(self, src):
+        cls_tokens = self.cls_token.expand(src.shape[1], -1, -1)
+        src = torch.cat((cls_tokens, src), dim=0)
         mask = self._generate_square_subsequent_mask(len(src)).cuda()
         self.src_mask = mask
-        
         src = self.pos_encoder(src)
         output = self.transformer_encoder(src,self.src_mask)#, self.src_mask)
         output = torch.transpose(output, 0, 1).contiguous()
@@ -43,6 +46,8 @@ class TimeSeriesTransformer(nn.Module):
             output = torch.max(output, 1)[0].squeeze()
         elif self.transformer_pooling == 'last':
             output = output[:, -1, :]
+        elif self.transformer_pooling == 'first':
+            output = output[:, 0, :]
         elif self.transformer_pooling == 'all':
             pass
         else:
