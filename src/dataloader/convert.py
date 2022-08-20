@@ -9,7 +9,7 @@ def convert_timeseries_into_mmap(data_dir, save_dir, n_rows=100000, freq=1):
     read csv file and convert time series data into mmap file.
     """
     save_path = Path(save_dir) / 'ts.dat'
-    shape = (n_rows, 24, 34)
+    shape = (n_rows, 24*freq, 34)
     write_file = np.memmap(save_path, dtype=np.float32, mode='w+', shape=shape)
     ids = []
     n = 0
