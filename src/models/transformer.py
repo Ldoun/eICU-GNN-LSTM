@@ -31,7 +31,7 @@ class TimeSeriesTransformer(nn.Module):
         self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=config['num_layers'])
                 
     def forward(self, src):
-        cls_tokens = self.cls_token.expand(src.shape[1], -1, -1)
+        cls_tokens = self.cls_token.expand(-1, src.shape[1], -1)
         src = torch.cat((cls_tokens, src), dim=0)
         mask = self._generate_square_subsequent_mask(len(src)).cuda()
         self.src_mask = mask
