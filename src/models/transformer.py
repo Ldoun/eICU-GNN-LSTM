@@ -26,7 +26,7 @@ class TimeSeriesTransformer(nn.Module):
         super().__init__()
         self.transformer_pooling = config['transformer_pooling'] 
         self.pos_encoder = PositionalEncoding(config['feature_size'])
-        self.cls_token = trunc_normal_(nn.Parameter(torch.zeros(1, 1, config['feature_size'])))
+        self.cls_token = nn.Parameter(torch.zeros(1, 1, config['feature_size'])) # not using trunc_normal
         self.encoder_layer = nn.TransformerEncoderLayer(d_model=config['feature_size'], nhead=config['n_head'], dropout=config['transformer_dropout']) #batch_first=True not possible
         self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=config['num_layers'])
                 
