@@ -8,8 +8,9 @@ def convert_timeseries_into_mmap(data_dir, save_dir, n_rows=100000, freq=1):
     """
     read csv file and convert time series data into mmap file.
     """
+    input_size = pd.read_csv(Path(data_dir) / 'test' / 'timeseries.csv', nrows=100).shape[1]
     save_path = Path(save_dir) / 'ts.dat'
-    shape = (n_rows, 24*freq, 34)
+    shape = (n_rows, 24*freq, input_size)
     write_file = np.memmap(save_path, dtype=np.float32, mode='w+', shape=shape)
     ids = []
     n = 0
@@ -21,7 +22,7 @@ def convert_timeseries_into_mmap(data_dir, save_dir, n_rows=100000, freq=1):
         csv_path = Path(data_dir) / split / 'timeseries.csv'
         df = pd.read_csv(csv_path)
         arr = df.values
-        new = np.reshape(arr, (-1, 24*freq, df.shape[1]))
+        new = np.reshape(arr, (-1, 24*freq, input_size))
         pos_to_id = new[:, 0, 0]
         ids.append(pos_to_id)
         new = new[:, :, 1:] # no patient column
