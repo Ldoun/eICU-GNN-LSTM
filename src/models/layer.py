@@ -59,15 +59,15 @@ class TransformerEncoderLayer(Module):
         returned, and an additional speedup proportional to the fraction of the input that
         is padding can be expected.
     """
-    __constants__ = ['batch_first', 'norm_first']
+    __constants__ = ['norm_first']
 
     def __init__(self, d_model: int, nhead: int, dim_feedforward: int = 2048, dropout: float = 0.1,
                  activation: Union[str, Callable[[Tensor], Tensor]] = F.relu,
-                 layer_norm_eps: float = 1e-5, batch_first: bool = False, norm_first: bool = False,
+                 layer_norm_eps: float = 1e-5, norm_first: bool = False,
                  device=None, dtype=None, register_hook=False) -> None:
         factory_kwargs = {'device': device, 'dtype': dtype}
         super(TransformerEncoderLayer, self).__init__()
-        self.self_attn = MultiheadAttention(d_model, nhead, dropout=dropout, batch_first=batch_first,
+        self.self_attn = MultiheadAttention(d_model, nhead, dropout=dropout, 
                                             **factory_kwargs)
         # Implementation of Feedforward model
         self.linear1 = Linear(d_model, dim_feedforward, **factory_kwargs)
@@ -121,7 +121,6 @@ class TransformerEncoderLayer(Module):
         # see Fig. 1 of https://arxiv.org/pdf/2002.04745v1.pdf
 
         if (src.dim() == 3 and not self.norm_first and not self.training and
-            self.self_attn.batch_first and
             self.self_attn._qkv_same_embed_dim and self.activation_relu_or_gelu and
             self.norm1.eps == self.norm2.eps and
             src_mask is None and
