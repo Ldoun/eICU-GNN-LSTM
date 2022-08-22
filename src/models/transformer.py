@@ -26,7 +26,10 @@ class TimeSeriesTransformer(nn.Module):
         super().__init__()
         self.transformer_pooling = config['transformer_pooling'] 
         self.pos_encoder = PositionalEncoding(config['feature_size'])
-        self.cls_token = nn.Parameter(torch.zeros(1, 1, config['feature_size'])) # not using trunc_normal
+        self.use_cls = False
+        if config['transformer_pooling']== 'first':
+            self.use_cls = True
+            self.cls_token = nn.Parameter(torch.zeros(1, 1, config['feature_size'])) # not using trunc_normal
         self.encoder_layer = nn.TransformerEncoderLayer(d_model=config['feature_size'], nhead=config['n_head'], dropout=config['transformer_dropout']) #batch_first=True not possible
         self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=config['num_layers'])
         
@@ -55,8 +58,9 @@ class TimeSeriesTransformer(nn.Module):
         return self.attention_map
                 
     def forward(self, src):
-        cls_tokens = self.cls_token.expand(-1, src.shape[1], -1)
-        src = torch.cat((cls_tokens, src), dim=0)
+        if self.use_cls:
+            cls_tokens = self.cls_token.expand(-1, src.shape[1], -1)
+            src = torch.cat((cls_tokens, src), dim=0)
         mask = self._generate_square_subsequent_mask(len(src)).cuda()
         self.src_mask = mask
         src = self.pos_encoder(src)
