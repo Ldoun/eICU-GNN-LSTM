@@ -52,6 +52,7 @@ class TimeSeriesTransformer(nn.Module):
         def fn(_, __, output):
             output[1].register_hook(self.save_attn_gradients(n))
             self.attention_map[n] = output[1]
+            return output[0],output[1]
         return fn
 
     def get_attention_map(self):
