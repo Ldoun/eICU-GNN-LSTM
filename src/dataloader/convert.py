@@ -21,7 +21,7 @@ def convert_timeseries_into_mmap(data_dir, save_dir, n_rows=100000, freq=1):
         csv_path = Path(data_dir) / split / 'timeseries.csv'
         df = pd.read_csv(csv_path)
         arr = df.values
-        new = np.reshape(arr, (-1, 24*freq, 35))
+        new = np.reshape(arr, (-1, 24*freq, df.shape[1]))
         pos_to_id = new[:, 0, 0]
         ids.append(pos_to_id)
         new = new[:, :, 1:] # no patient column
