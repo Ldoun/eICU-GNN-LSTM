@@ -442,8 +442,8 @@ if __name__ == '__main__':
     if config['fp_emb'] or config['fp_logits'] or config['fp_attn']:
         main_forward_pass(config)
     
-    if config['fp_attn_transformer']:
-        main_forward_pass_transformer(config)
+    #if config['fp_attn_transformer']:
+    #    main_forward_pass_transformer(config)
 
     if config['test']:
         main_test(config)
