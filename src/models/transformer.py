@@ -31,7 +31,7 @@ class TimeSeriesTransformer(nn.Module):
         if config['transformer_pooling']== 'first':
             self.use_cls = True
             self.cls_token = nn.Parameter(torch.zeros(1, 1, config['feature_size'])) # not using trunc_normal
-        self.encoder_layer = TransformerEncoderLayer(d_model=config['feature_size'], nhead=config['n_head'], dropout=config['transformer_dropout']) #batch_first=True not possible
+        self.encoder_layer = TransformerEncoderLayer(d_model=config['feature_size'], nhead=config['n_head'], dropout=config['transformer_dropout'], register_hook=config['fp_attn_transformer']) #batch_first=True not possible
         self.transformer_encoder = nn.TransformerEncoder(self.encoder_layer, num_layers=config['num_layers'])
                 
     def forward(self, src):
