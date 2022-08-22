@@ -41,7 +41,7 @@ class TransformerEncoderLayer(Module):
 
         self.activation = _get_activation_fn(activation)
 
-        self.reregister_hook = register_hook
+        self.register_hook = register_hook
         if self.register_hook:
             self.attn_gradients = None
             self.attention_map = None
