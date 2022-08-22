@@ -34,7 +34,7 @@ class TimeSeriesTransformer(nn.Module):
             self.attn_gradients = {}
             self.attention_map = {}
 
-            for n, encoder_layer in enumerate(self.transformer_encoder.transformer_encoder.layers):
+            for n, encoder_layer in enumerate(self.transformer_encoder.layers):
                 encoder_layer.self_attn.register_forward_hook(self.save_attention_map(n))
 
     def save_attn_gradients(self, n):
