@@ -18,7 +18,7 @@ def get_device_and_dtype():
     dtype = torch.cuda.sparse.ByteTensor if device.type == 'cuda' else torch.sparse.ByteTensor
     return device, dtype
 
-def diagnoses_scores_matrix(diagnoses, freq_adjustment, save_edge_values, batch_size, genders_scores, ages_scores, k, alpha, beta, gamma):
+def diagnoses_scores_matrix(diagnoses, freq_adjustment, save_edge_values, batch_size, genders_scores, ages_scores, k, device, dtype, alpha, beta, gamma):
 
     freq_adjustment = 1 / freq_adjustment
     freq_adjustment = torch.tensor(freq_adjustment * 1000, device=device).type(dtype) + 1
@@ -153,7 +153,7 @@ def get_graph(config):
     del all_diagnoses
     diagnoses = torch.tensor(diagnoses, device=device)
     # get diagnoses score matrix
-    u, v, vals, k = diagnoses_scores_matrix(diagnoses, freq_adjustment, False, 1000, genders_scores, ages_scores, 3, config['alpha'], config['beta'], config['gamma'])
+    u, v, vals, k = diagnoses_scores_matrix(diagnoses, freq_adjustment, False, 1000, genders_scores, ages_scores, 3, device, dtype, config['alpha'], config['beta'], config['gamma'])
     del diagnoses
     
     np.savetxt('{}{}_{}_u_k={}{}.txt'.format(graph_dir, config['tuning_version'], 'k_closest', k, adjust), u.astype(int), fmt='%i')
