@@ -116,13 +116,14 @@ def main_tune(tune_function, config):
             parameter_columns.append(key)
 
     if 'transformer' in config['model']:
-        for key, value in transformer_grid.items():
-            config[key] = value
-            parameter_columns.append(key)
-
-        for key, value in create_graph_grid.items():
-            config[key] = value
-            parameter_columns.append(key)
+        if config['tune_graph']:
+            for key, value in create_graph_grid.items():
+                config[key] = value
+                parameter_columns.append(key)
+        else:
+            for key, value in transformer_grid.items():
+                config[key] = value
+                parameter_columns.append(key)
     
     if config['fix_g_params'] or config['fix_l_params']: #fix params
         if config['dynamic_g']:

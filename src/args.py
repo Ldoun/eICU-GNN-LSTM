@@ -31,6 +31,7 @@ def add_tune_params(parser):
     parser.add_argument('--gpus_per_trial', type=int, default=1)
     parser.add_argument('--cpus_per_trial', type=int, default=7)
     parser.add_argument('--grace_period', type=int, default=3)
+    parser.add_argument('--tune_graph', action='store_true')
     parser.add_argument('--fix_g_params', action='store_true')
     parser.add_argument('--fix_l_params', action='store_true')
     return parser
@@ -421,7 +422,7 @@ def read_params_from_file(arg_dict, overwrite=False):
         config_path = Path(arg_dict['config_file'])
     
     data = load_json(config_path)
-    arg_dict.pop('config_file')
+    #arg_dict.pop('config_file')
 
     if not overwrite:
         for key, value in data.items():
