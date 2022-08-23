@@ -123,7 +123,7 @@ def init_transformer_args(parser):
     parser.add_argument('--input_size', type=int, default=34)
     return parser
 
-def init_creat_graph_args(parser):
+def add_create_graph_args(parser):
     """
     define graph creation related hyperparams
     """

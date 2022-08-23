@@ -3,7 +3,7 @@ os.environ["SLURM_JOB_NAME"] = "bash"
 import pytorch_lightning as pl
 from train_transformergnn import get_data, Model
 from src.hyperparameters.search import ihm_TuneReportCallback, los_TuneReportCallback, main_tune
-from src.args import init_creat_graph_args, init_transformergnn_args, add_tune_params, add_configs, get_transformer_out_dim
+from src.args import add_create_graph_args, init_transformergnn_args, add_tune_params, add_configs, get_transformer_out_dim
 from graph_construction.create_graph_hj import get_graph
 import ray
 
@@ -37,7 +37,7 @@ def main_train(config):
 
 if __name__ == '__main__':
     parser = init_transformergnn_args()
-    parser = init_creat_graph_args()
+    parser = add_create_graph_args(parser)
     parser = add_tune_params(parser)
     config = parser.parse_args()
     config.model = 'transformergnn'
