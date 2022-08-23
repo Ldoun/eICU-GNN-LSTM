@@ -91,37 +91,36 @@ gnn_specific_grid = {
 
 
 def main_tune(tune_function, config):
-    parameter_columns = ['lr', 'l2', 'main_dropout']
+    parameter_columns = []
+    if config['tune_graph']:
+        for key, value in create_graph_grid.items():
+            config[key] = value
+            parameter_columns.append(key)
+    else:
+        parameter_columns.extend(['lr', 'l2', 'main_dropout'])
+        for key, value in all_grid.items():
+            config[key] = value
+        
+        if config['model'] == 'lstm':
+            pass
 
-    for key, value in all_grid.items():
-        config[key] = value
-    
-    if config['model'] == 'lstm':
-        pass
+        elif config['dynamic_g']:
+            gnn_grid = gnn_specific_grid[config['gnn_name']]
+            for key, value in gnn_grid.items():
+                if ('ns_size' not in key):
+                    config[key] = value
+                    parameter_columns.append(key)
 
-    elif config['dynamic_g']:
-        gnn_grid = gnn_specific_grid[config['gnn_name']]
-        for key, value in gnn_grid.items():
-            if ('ns_size' not in key):
+        elif 'gnn' in config['model']: # lstmgnn / ns_gnn
+            for key, value in nsgnn_grid.items():
+                config[key] = value
+                parameter_columns.append(key)
+            gnn_grid = gnn_specific_grid[config['gnn_name']]
+            for key, value in gnn_grid.items():
                 config[key] = value
                 parameter_columns.append(key)
 
-    elif 'gnn' in config['model']: # lstmgnn / ns_gnn
-        for key, value in nsgnn_grid.items():
-            config[key] = value
-            parameter_columns.append(key)
-        gnn_grid = gnn_specific_grid[config['gnn_name']]
-        for key, value in gnn_grid.items():
-            config[key] = value
-            parameter_columns.append(key)
-
-    if 'transformer' in config['model']:
-        if config['tune_graph']:
-            config = {}
-            for key, value in create_graph_grid.items():
-                config[key] = value
-                parameter_columns.append(key)
-        else:
+        if 'transformer' in config['model']:
             for key, value in transformer_grid.items():
                 config[key] = value
                 parameter_columns.append(key)
