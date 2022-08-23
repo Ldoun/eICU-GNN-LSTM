@@ -100,7 +100,7 @@ def ages_scores_matrix(ages): # 빼고 절댓값
 def get_graph(config):
     device, dtype = get_device_and_dtype()
     
-    with open('paths.json', 'r') as f:
+    with open(config['config_file'], 'r') as f:
         loader = json.load(f)
 
         eICU_path = loader["eICU_path"]
