@@ -45,7 +45,7 @@ transformer_grid = {
     "num_layers": tune.choice([1,2,3,4,5]),
 }
 
-creat_graph_grid = {
+create_graph_grid = {
     "alpha": tune.uniform(0, 100),
     "beta": tune.uniform(0, 100),
     "gamma": tune.uniform(-100, 0)
@@ -117,6 +117,10 @@ def main_tune(tune_function, config):
 
     if 'transformer' in config['model']:
         for key, value in transformer_grid.items():
+            config[key] = value
+            parameter_columns.append(key)
+
+        for key, value in create_graph_grid.items():
             config[key] = value
             parameter_columns.append(key)
     
