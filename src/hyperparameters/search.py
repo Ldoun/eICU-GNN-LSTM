@@ -117,6 +117,7 @@ def main_tune(tune_function, config):
 
     if 'transformer' in config['model']:
         if config['tune_graph']:
+            config = {}
             for key, value in create_graph_grid.items():
                 config[key] = value
                 parameter_columns.append(key)
