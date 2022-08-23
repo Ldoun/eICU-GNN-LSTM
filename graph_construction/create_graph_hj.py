@@ -4,6 +4,7 @@ import numpy as np
 from scipy import sparse
 import json
 import os
+import sys
 
 def get_freqs(train_diagnoses):
     return train_diagnoses.sum()
@@ -98,6 +99,7 @@ def ages_scores_matrix(ages): # 빼고 절댓값
     
 # if __name__ == '__main__':
 def get_graph(config):
+    sys.path.append(''.join(config['config_file'].split('/')[:-1]))
     device, dtype = get_device_and_dtype()
     
     with open(config['config_file'], 'r') as f:
