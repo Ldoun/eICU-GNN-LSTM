@@ -8,7 +8,7 @@ from graph_construction.create_graph_hj import get_graph
 import ray
 
 def main_train(config):
-    config['tuning_version'] = ray.tune.get_trial_id()
+    config['tuning_version'] = str(config['alpha'])+str(config['beta'])+str(config['gamma'])
     print(config['tuning_version'])
     print('-'*80)
     get_graph(config)
