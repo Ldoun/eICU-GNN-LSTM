@@ -3,7 +3,7 @@ from ray import tune
 from ray.tune import CLIReporter
 from functools import partial
 from ray.tune.schedulers import ASHAScheduler
-#from src.hyperparameters import ns_gnn_2d, ns_gnn_4, dynamic, lstmgnn
+from src.hyperparameters.best_parameters import transformergnn#ns_gnn_2d, ns_gnn_4, dynamic, lstmgnn
 
 
 class ihm_TuneReportCallback(Callback):
@@ -134,6 +134,8 @@ def main_tune(tune_function, config):
                 best_params = ns_gnn_2d[config['task']][config['gnn_name']]
             elif '4' in config['g_version']:
                 best_params = ns_gnn_4[config['task']][config['gnn_name']]
+        elif config['model'] == 'transformergnn':
+            best_params = transformergnn[config['task']][config['gnn_name']]
         else:
             print(config['model'], config['dynamic_g'], config['g_version'])
         # fixing the values 
