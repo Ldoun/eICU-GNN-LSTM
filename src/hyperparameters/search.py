@@ -45,6 +45,12 @@ transformer_grid = {
     "num_layers": tune.choice([1,2,3,4,5]),
 }
 
+creat_graph_grid = {
+    "alpha": tune.uniform(0, 100),
+    "beta": tune.uniform(0, 100),
+    "gamma": tune.uniform(-100, 0)
+}
+
 gnn_specific_grid = {
     'sage': 
         {   

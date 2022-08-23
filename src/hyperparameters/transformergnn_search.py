@@ -3,9 +3,15 @@ os.environ["SLURM_JOB_NAME"] = "bash"
 import pytorch_lightning as pl
 from train_transformergnn import get_data, Model
 from src.hyperparameters.search import ihm_TuneReportCallback, los_TuneReportCallback, main_tune
-from src.args import init_transformergnn_args, add_tune_params, add_configs, get_transformer_out_dim
+from src.args import init_creat_graph_args, init_transformergnn_args, add_tune_params, add_configs, get_transformer_out_dim
+from graph_construction.create_graph_hj import get_graph
+import ray
 
 def main_train(config):
+    config['tuning_version'] = ray.air.session.get_trial_id
+    print(config['tuning_version'])
+    print('-'*80)
+    get_graph(config)
     dataset, train_loader, subgraph_loader = get_data(config)
     config['transformer_outdim'], config['transformer_last_ts_dim'] = get_transformer_out_dim(config)
     config['gnn_indim'] = config['transformer_outdim']
@@ -31,6 +37,7 @@ def main_train(config):
 
 if __name__ == '__main__':
     parser = init_transformergnn_args()
+    parser = init_creat_graph_args()
     parser = add_tune_params(parser)
     config = parser.parse_args()
     config.model = 'transformergnn'

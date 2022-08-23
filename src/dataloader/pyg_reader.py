@@ -68,13 +68,13 @@ def read_txt(path, node=True):
     else:
         return [float(n) for n in u_list.split('\n') if n != '']
 
-def read_graph_edge_list(graph_dir, version):
+def read_graph_edge_list(graph_dir, version,tuning_version=''):
     """
     return edge lists, and edge similarity scores from specified graph.
     """
     version2filename = {'default': 'k_closest_{}_k=3_adjusted_ns.txt'}
 
-    file_name = version2filename[version]
+    file_name = tuning_version+version2filename[version]
     u_path = Path(graph_dir) / file_name.format('u')
     v_path = Path(graph_dir) / file_name.format('v')
     scores_path = Path(graph_dir) / file_name.format('scores')
@@ -109,7 +109,7 @@ class GraphDataset(Dataset):
             if config['random_g']:
                 edge_index, edge_attr = get_rdm_edge_index(N)
             else:
-                us, vs, edge_attr = read_graph_edge_list(config['graph_dir'], config['g_version'])
+                us, vs, edge_attr = read_graph_edge_list(config['graph_dir'], config['g_version'], config['tuning_version']+'_')
                 edge_index, edge_attr = get_edge_index(us, vs, edge_attr)
         
         # Record feature dimensions

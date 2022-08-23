@@ -123,6 +123,18 @@ def init_transformer_args(parser):
     parser.add_argument('--input_size', type=int, default=34)
     return parser
 
+def init_creat_graph_args(parser):
+    """
+    define graph creation related hyperparams
+    """
+
+    # shared
+    parser.add_argument('--alpha', type=float)
+    parser.add_argument('--beta', type=float)
+    parser.add_argument('--gamma', type=float)
+    parser.add_argument('--tuning_version', type=str, default='')
+    return parser
+
 
 def init_gnn_args(parser):
     """
