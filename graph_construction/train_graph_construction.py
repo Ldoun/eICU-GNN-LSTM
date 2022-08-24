@@ -9,7 +9,7 @@ import logging
 from tqdm import tqdm
 
 class Trainer():
-    def __init__(self, log) -> None:
+    def __init__(self) -> None:
         self.model = Graph_Score_Model().half().cuda()
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.001, momentum=0.9)
         self.loss_func = torch.nn.MSELoss()
@@ -18,23 +18,25 @@ class Trainer():
         self.lr_scheduler = None #필요할수도
         self.iter = len(self.train_loader)
         self.epoch = 50
-        self.log = log
 
     def train_epoch(self, epoch):
         self.model.train()
         total_loss = 0
 
-        for batch_idx, (data, target) in tqdm(enumerate(self.train_loader), total=self.iter):
-            data = data.cuda()
-            target = target.cuda()
-            prediction = self.model(data, self.info)
-            loss = self.loss_func(target, prediction)
-            self.optimizer.zero_grad()
-            loss.backward()
-            self.optimizer.step()
-            total_loss += loss.item()
+        with tqdm(self.train_loader, unit='batch') as tepoch:
+            for data, target in tqdm(self.train_loader, total=self.iter):
+                tepoch.set_description(f"Epoch {epoch}")
 
-            self.log.info(f'epoch {epoch} {batch_idx}/{self.iter} loss: {loss.item()}')
+                data = data.cuda()
+                target = target.cuda()
+                prediction = self.model(data, self.info)
+                loss = self.loss_func(target, prediction)
+                self.optimizer.zero_grad()
+                loss.backward()
+                self.optimizer.step()
+                total_loss += loss.item()
+
+                tepoch.set_postfix(loss=loss.item())
 
         return total_loss / self.iter
 
@@ -53,7 +55,7 @@ class Graph_Score_Model(nn.Module):
 
     def forward(self, x, info):
         x = self.layer(x).squeeze(-1) #(batch, all_patient-1, 3)
-        attention_weight = F.softmax(x, dim=-1) #(batch, all_patient-1, 1)
+        attention_weight = F.softmax(x, dim=-1).fill_diagonal_(-np.inf) #(batch, all_patient-1, 1)
         y = attention_weight * info #(batch, all_patient-1), (batch, all_patient-1) 
         return torch.sum(y, dim=1)
 
@@ -75,9 +77,9 @@ class Score_Dataset(Dataset):
 
 def get_dataloader():
     path = '/home/20191650/eICU-GNN-Transformer/data/tuning_hj_graphs'
-    diagnosis_data = torch.from_numpy(np.load(Path(path) / 'diagnoses_scores_1000.npy').astype(np.float16)).fill_diagonal_(-np.inf)
-    age_data = torch.from_numpy(np.load(Path(path) / 'age_scores_1000.npy').astype(np.float16)).fill_diagonal_(-np.inf)
-    gender_data = torch.from_numpy(np.load(Path(path) / 'gender_scores_1000.npy').astype(np.float16)).fill_diagonal_(-np.inf)
+    diagnosis_data = torch.from_numpy(np.load(Path(path) / 'diagnoses_scores_1000.npy').astype(np.float16))
+    age_data = torch.from_numpy(np.load(Path(path) / 'age_scores_1000.npy').astype(np.float16))
+    gender_data = torch.from_numpy(np.load(Path(path) / 'gender_scores_1000.npy').astype(np.float16))
     data = torch.stack([diagnosis_data, age_data, gender_data], axis=-1)
 
     Los_data = torch.FloatTensor(pd.read_csv(Path(path) / 'all_labels.csv')['actualiculos'].values) [:1000]
@@ -113,11 +115,7 @@ class TqdmLoggingHandler(logging.StreamHandler):
 
 
 if __name__ == '__main__':
-    log = logging.getLogger(__name__)
-    log.handlers = []
-    log.setLevel(logging.INFO)
-    log.addHandler(TqdmLoggingHandler())
-    trainer = Trainer(log)
+    trainer = Trainer()
     trainer.train()
 
 
