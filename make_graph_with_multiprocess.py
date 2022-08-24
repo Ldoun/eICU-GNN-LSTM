@@ -16,6 +16,7 @@ for _ in range(n_trial // once_per_trial):
         config['alpha'] = random.randrange(0,100)
         config['beta'] = random.randrange(0,100)
         config['gamma'] = random.randrange(-100,0)
+        config['tuning_version'] = f"{config['alpha']}_{config['beta']}_{config['gamma']}"
         print(str(config['alpha']) , str(config['beta']) , str(config['gamma']))
         write_file.write(str(config['alpha']) , str(config['beta']) , str(config['gamma']) +'\n')
         write_file.flush()
