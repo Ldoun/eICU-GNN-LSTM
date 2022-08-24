@@ -63,7 +63,7 @@ class Score_Dataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, index):
-        x = self.dat[index]
+        x = self.data[index]
         y = self.label[index]
         return x, y
 
