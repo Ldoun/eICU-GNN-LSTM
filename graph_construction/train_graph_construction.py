@@ -11,7 +11,8 @@ class Trainer():
         self.model = Graph_Score_Model().half().cuda()
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.001, momentum=0.9)
         self.loss_func = torch.nn.MSELoss()
-        self.train_loader, self.valid_loader = get_dataloader()
+        self.train_loader, self.info = get_dataloader()
+        self.info = self.info.cuda()
         self.lr_scheduler = None #필요할수도
         self.iter = len(self.train_loader)
         self.epoch = 50
@@ -19,11 +20,10 @@ class Trainer():
     def train_epoch(self, epoch):
         self.model.train()
         total_loss = 0
-        for batch_idx, (data, target, info) in enumerate(self.train_loader):
+        for batch_idx, (data, target) in enumerate(self.train_loader):
             data = data.cuda()
-            info = info.cuda()
             target = target.cuda()
-            prediction = self.model(data, info)
+            prediction = self.model(data, self.info)
             loss = self.loss_func(target, prediction)
             self.optimizer.zero_grad()
             loss.backward()
@@ -49,8 +49,8 @@ class Graph_Score_Model(nn.Module):
 
     def forward(self, x, info):
         x = self.layer(x).squeeze(-1) #(batch, all_patient-1, 3)
-        attentoin_weight = F.softmax(x, dim=-1) #(batch, all_patient-1, 1)
-        y = attentoin_weight * info #(batch, all_patient-1), (batch, all_patient-1) 
+        attention_weight = F.softmax(x, dim=-1) #(batch, all_patient-1, 1)
+        y = attention_weight * info #(batch, all_patient-1), (batch, all_patient-1) 
         return torch.sum(y, dim=1)
 
 class Score_Dataset(Dataset):
@@ -65,9 +65,9 @@ class Score_Dataset(Dataset):
 
     def __getitem__(self, index):
         x = self.data[index]
-        x_info = self.label
+        #x_info = self.label
         y = self.label[index]
-        return x, y, x_info
+        return x, y
 
 def get_dataloader():
     path = '/home/20191650/eICU-GNN-Transformer/data/tuning_hj_graphs'
@@ -76,7 +76,7 @@ def get_dataloader():
     gender_data = torch.from_numpy(np.load(Path(path) / 'gender_scores_1000.npy').astype(np.float16)).fill_diagonal_(-np.inf)
     data = torch.stack([diagnosis_data, age_data, gender_data], axis=-1)
 
-    Los_data = torch.FloatTensor(pd.read_csv(Path(path) / 'all_labels.csv')['actualiculos'].values)  
+    Los_data = torch.FloatTensor(pd.read_csv(Path(path) / 'all_labels.csv')['actualiculos'].values) [:1000]
 
     #train_ratio = 0.8
     #train_cnt = int(data.shape[0] * train_ratio)
@@ -91,7 +91,7 @@ def get_dataloader():
 
     train_loader = DataLoader(dataset=train_dataset, batch_size=2, shuffle=True)
     #valid_loader = DataLoader(dataset=valid_dataset, batch_size=2, shuffle=False)
-    return train_loader, None
+    return train_loader, Los_data
 
 
 if __name__ == '__main__':
