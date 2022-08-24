@@ -73,7 +73,7 @@ def get_dataloader():
     gender_data = np.load(Path(path) / 'gender_scores_1000.npy')
     data = torch.from_numpy(np.stack([diagnosis_data, age_data, gender_data], axis=-1))
 
-    Los_data = torch.FloatTensr(pd.read_csv(Path(path) / 'all_labels.csv')['actualiculos'].values)  
+    Los_data = torch.FloatTensor(pd.read_csv(Path(path) / 'all_labels.csv')['actualiculos'].values)  
 
     train_ratio = 0.8
     train_cnt = int(data.shape[0] * train_ratio)
