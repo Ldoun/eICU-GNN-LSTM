@@ -28,6 +28,7 @@ class Trainer():
         with tqdm(self.train_loader, unit='batch', total=self.iter) as tepoch:
             for data, target in self.train_loader:
                 tepoch.set_description(f"Epoch {epoch}")
+                tepoch.update(1)
 
                 data = data.cuda()
                 target = target.cuda()
