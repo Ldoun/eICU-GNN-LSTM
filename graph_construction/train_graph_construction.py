@@ -77,20 +77,20 @@ def get_dataloader():
 
     Los_data = torch.FloatTensor(pd.read_csv(Path(path) / 'all_labels.csv')['actualiculos'].values)  
 
-    train_ratio = 0.8
-    train_cnt = int(data.shape[0] * train_ratio)
-    valid_cnt = data.shape[0] - train_cnt
-    indices = torch.randperm(data.shape[0])
+    #train_ratio = 0.8
+    #train_cnt = int(data.shape[0] * train_ratio)
+    #valid_cnt = data.shape[0] - train_cnt
+    #indices = torch.randperm(data.shape[0])
 
-    train_x,valid_x = torch.index_select(data,dim =0,index= indices).split([train_cnt,valid_cnt],dim = 0)
-    train_y,valid_y = torch.index_select(Los_data,dim =0,index= indices).split([train_cnt,valid_cnt],dim = 0)
+    #train_x,valid_x = torch.index_select(data,dim=0,index=indices).split([train_cnt,valid_cnt],dim = 0)
+    #train_y,valid_y = torch.index_select(Los_data,dim=0,index= indices).split([train_cnt,valid_cnt],dim = 0)
 
-    train_dataset = Score_Dataset(train_x, train_y)
-    valid_dataset = Score_Dataset(valid_x, valid_y)
+    train_dataset = Score_Dataset(data, Los_data)
+    #valid_dataset = Score_Dataset(valid_x, valid_y)
 
     train_loader = DataLoader(dataset=train_dataset, batch_size=2, shuffle=True)
-    valid_loader = DataLoader(dataset=valid_dataset, batch_size=2, shuffle=False)
-    return train_loader, valid_loader
+    #valid_loader = DataLoader(dataset=valid_dataset, batch_size=2, shuffle=False)
+    return train_loader, None
 
 
 if __name__ == '__main__':
