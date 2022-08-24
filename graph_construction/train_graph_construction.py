@@ -23,8 +23,8 @@ class Trainer():
         self.model.train()
         total_loss = 0
 
-        with tqdm(self.train_loader, unit='batch') as tepoch:
-            for data, target in tqdm(self.train_loader, total=self.iter):
+        with tqdm(self.train_loader, unit='batch', total=self.iter) as tepoch:
+            for data, target in self.train_loader:
                 tepoch.set_description(f"Epoch {epoch}")
 
                 data = data.cuda()
@@ -46,7 +46,7 @@ class Trainer():
     def train(self):
         for epoch in range(1, self.epoch+1):
             total_loss = self.train_epoch(epoch)
-            print(f'{epoch}: {total_loss} {self.model.layer.weight[0].item()} {self.model.layer.weight[1].item()} {self.model.layer.weight[2].item()}')
+            print(f'{epoch}: {total_loss} {self.model.layer.weight[0][0].item()} {self.model.layer.weight[0][1].item()} {self.model.layer.weight[0][2].item()}')
 
 class Graph_Score_Model(nn.Module):
     def __init__(self) -> None:
@@ -98,19 +98,6 @@ def get_dataloader():
     train_loader = DataLoader(dataset=train_dataset, batch_size=2, shuffle=True)
     #valid_loader = DataLoader(dataset=valid_dataset, batch_size=2, shuffle=False)
     return train_loader, Los_data
-
-
-class TqdmLoggingHandler(logging.StreamHandler):
-    """Avoid tqdm progress bar interruption by logger's output to console"""
-
-    def emit(self, record):
-        try:
-            msg = self.format(record)
-            tqdm.write(msg, end=self.terminator)
-        except RecursionError:
-            raise
-        except Exception:
-            self.handleError(record)
 
 
 
