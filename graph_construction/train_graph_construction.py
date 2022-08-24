@@ -70,10 +70,10 @@ class Score_Dataset(Dataset):
 
 def get_dataloader():
     path = '/home/20191650/eICU-GNN-Transformer/data/tuning_hj_graphs'
-    diagnosis_data = np.fill_diagonal(np.load(Path(path) / 'diagnoses_scores_1000.npy').astype(np.float16), -np.inf)
-    age_data = np.fill_diagonal(np.load(Path(path) / 'age_scores_1000.npy').astype(np.float16), -np.inf)
-    gender_data = np.fill_diagonal(np.load(Path(path) / 'gender_scores_1000.npy').astype(np.float16), -np.inf)
-    data = torch.from_numpy(np.stack([diagnosis_data, age_data, gender_data], axis=-1).astype(np.float16))
+    diagnosis_data = torch.from_numpy(np.load(Path(path) / 'diagnoses_scores_1000.npy').astype(np.float16)).fill_diagonal_(-np.inf)
+    age_data = torch.from_numpy(np.load(Path(path) / 'age_scores_1000.npy').astype(np.float16)).fill_diagonal_(-np.inf)
+    gender_data = torch.from_numpy(np.load(Path(path) / 'gender_scores_1000.npy').astype(np.float16)).fill_diagonal_(-np.inf)
+    data = torch.stack([diagnosis_data, age_data, gender_data], axis=-1)
 
     Los_data = torch.FloatTensor(pd.read_csv(Path(path) / 'all_labels.csv')['actualiculos'].values)  
 
