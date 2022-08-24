@@ -9,6 +9,7 @@ import logging
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
 import os
+import gc
 
 class Trainer():
     def __init__(self) -> None:
@@ -90,6 +91,8 @@ def get_dataloader():
     age_data = torch.from_numpy(np.load(Path(path) / 'age_scores_all.npy').astype(np.float16))
     gender_data = torch.from_numpy(np.load(Path(path) / 'gender_scores_all.npy').astype(np.float16))
     data = torch.stack([diagnosis_data, age_data, gender_data], axis=-1)
+    del diagnosis_data,gender_data,age_data
+    gc.collect()
 
     Los_data = torch.FloatTensor(pd.read_csv(Path(path) / 'all_labels.csv')['actualiculos'].values)
 
