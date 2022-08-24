@@ -18,7 +18,7 @@ for _ in range(n_trial // once_per_trial):
         config['gamma'] = random.randrange(-100,0)
         print(str(config['alpha']) + str(config['beta']) + str(config['gamma']))
         write_file.write(str(config['alpha']) + str(config['beta']) + str(config['gamma']) +'\n')
-        p = mp.Process(target=get_graph,kwargs=config)
+        p = mp.Process(target=get_graph, args=(config,))
         p.start()
         procs.append(p)
         print(f'{once_per_trial} done')
