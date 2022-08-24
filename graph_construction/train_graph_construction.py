@@ -19,10 +19,10 @@ class Trainer():
     def train_epoch(self, epoch):
         self.model.train()
         total_loss = 0
-        for batch_idx, (data, target) in enumerate(self.train_loader):
+        for batch_idx, (data, target, info) in enumerate(self.train_loader):
             data = data.cuda()
             target = target.cuda()
-            prediction = self.model(data)
+            prediction = self.model(data, info)
             loss = self.loss_func(target, prediction)
             self.optimizer.zero_grad()
             loss.backward()
@@ -64,14 +64,15 @@ class Score_Dataset(Dataset):
 
     def __getitem__(self, index):
         x = self.data[index]
+        x_info = self.label
         y = self.label[index]
-        return x, y
+        return x, y, x_info
 
 def get_dataloader():
     path = '/home/20191650/eICU-GNN-Transformer/data/tuning_hj_graphs'
-    diagnosis_data = np.load(Path(path) / 'diagnoses_scores_1000.npy')
-    age_data = np.load(Path(path) / 'age_scores_1000.npy')
-    gender_data = np.load(Path(path) / 'gender_scores_1000.npy')
+    diagnosis_data = np.fill_diagonal(np.load(Path(path) / 'diagnoses_scores_1000.npy'), -np.inf)
+    age_data = np.fill_diagonal(np.load(Path(path) / 'age_scores_1000.npy'), -np.inf)
+    gender_data = np.fill_diagonal(np.load(Path(path) / 'gender_scores_1000.npy'), -np.inf)
     data = torch.from_numpy(np.stack([diagnosis_data, age_data, gender_data], axis=-1))
 
     Los_data = torch.FloatTensor(pd.read_csv(Path(path) / 'all_labels.csv')['actualiculos'].values)  
