@@ -5,6 +5,8 @@ from torch.utils.data import DataLoader, Dataset
 from pathlib import Path
 import numpy as np
 import pandas as pd
+import logging
+from tqdm import tqdm
 
 class Trainer():
     def __init__(self) -> None:
@@ -20,7 +22,8 @@ class Trainer():
     def train_epoch(self, epoch):
         self.model.train()
         total_loss = 0
-        for batch_idx, (data, target) in enumerate(self.train_loader):
+        pbar = tqdm(enumerate(self.train_loader))
+        for batch_idx, (data, target) in pbar:
             data = data.cuda()
             target = target.cuda()
             prediction = self.model(data, self.info)
@@ -30,7 +33,7 @@ class Trainer():
             self.optimizer.step()
             total_loss += loss.item()
 
-            print(f'epoch{epoch} {batch_idx}/{self.iter} loss: {loss.item()}')
+            log.info(f'epoch{epoch} {batch_idx}/{self.iter} loss: {loss.item()}')
 
         return total_loss / self.iter
 
@@ -94,6 +97,26 @@ def get_dataloader():
     return train_loader, Los_data
 
 
+class TqdmLoggingHandler(logging.StreamHandler):
+    """Avoid tqdm progress bar interruption by logger's output to console"""
+
+    def emit(self, record):
+        try:
+            msg = self.format(record)
+            tqdm.write(msg, end=self.terminator)
+        except RecursionError:
+            raise
+        except Exception:
+            self.handleError(record)
+
+
+
 if __name__ == '__main__':
+    log = logging.getLogger(__name__)
+    log.handlers = []
+    log.setLevel(logging.INFO)
+    log.addHandler(TqdmLoggingHandler())
     trainer = Trainer()
     trainer.train()
+
+
