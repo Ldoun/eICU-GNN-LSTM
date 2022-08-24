@@ -30,9 +30,9 @@ class Trainer():
             self.optimizer.step()
             total_loss += loss.item()
 
-            print(f'epoch{epoch} {batch_idx}/{len(self.iter)} loss: {loss.item()}')
+            print(f'epoch{epoch} {batch_idx}/{self.iter} loss: {loss.item()}')
 
-        return total_loss / len(self.iter)
+        return total_loss / self.iter
 
     def compute_similarity(self, d_v, g_v, a_v):
         return self.model.weight[0] * d_v + self.model.weight[1] * g_v + self.model.weight[2] * a_v
