@@ -86,12 +86,12 @@ class Score_Dataset(Dataset):
 
 def get_dataloader():
     path = '/home/20191650/eICU-GNN-Transformer/data/tuning_hj_graphs'
-    diagnosis_data = torch.from_numpy(np.load(Path(path) / 'diagnoses_scores_1000.npy').astype(np.float16))
-    age_data = torch.from_numpy(np.load(Path(path) / 'age_scores_1000.npy').astype(np.float16))
-    gender_data = torch.from_numpy(np.load(Path(path) / 'gender_scores_1000.npy').astype(np.float16))
+    diagnosis_data = torch.from_numpy(np.load(Path(path) / 'diagnoses_scores_all.npy').astype(np.float16))
+    age_data = torch.from_numpy(np.load(Path(path) / 'age_scores_all.npy').astype(np.float16))
+    gender_data = torch.from_numpy(np.load(Path(path) / 'gender_scores_all.npy').astype(np.float16))
     data = torch.stack([diagnosis_data, age_data, gender_data], axis=-1)
 
-    Los_data = torch.FloatTensor(pd.read_csv(Path(path) / 'all_labels.csv')['actualiculos'].values) [:1000]
+    Los_data = torch.FloatTensor(pd.read_csv(Path(path) / 'all_labels.csv')['actualiculos'].values)
 
     #train_ratio = 0.8
     #train_cnt = int(data.shape[0] * train_ratio)
