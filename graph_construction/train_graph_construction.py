@@ -89,11 +89,11 @@ def get_dataloader():
     path = '/home/20191650/eICU-GNN-Transformer/data/tuning_hj_graphs'
     diagnosis_data = torch.from_numpy(np.load(Path(path) / 'diagnoses_scores_all.npy').astype(np.float16))
     age_data = torch.from_numpy(np.load(Path(path) / 'age_scores_all.npy').astype(np.float16))
-    data = torch.stack([diagnosis_data,age_data], axis=-1)
+    data = torch.stack([diagnosis_data,age_data], dim=-1)
     del diagnosis_data, age_data
     gc.collect()
     gender_data = torch.from_numpy(np.load(Path(path) / 'gender_scores_all.npy').astype(np.float16))
-    data = torch.stack([data,gender_data],axis=1)
+    data = torch.stack([data,gender_data.unsqueeze(-1)],dim=-1)
     del gender_data
     gc.collect()
     #data = torch.stack([diagnosis_data, age_data, gender_data], axis=-1)
