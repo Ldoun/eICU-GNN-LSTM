@@ -9,7 +9,7 @@ import logging
 from tqdm import tqdm
 
 class Trainer():
-    def __init__(self) -> None:
+    def __init__(self, log) -> None:
         self.model = Graph_Score_Model().half().cuda()
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.001, momentum=0.9)
         self.loss_func = torch.nn.MSELoss()
@@ -18,12 +18,12 @@ class Trainer():
         self.lr_scheduler = None #필요할수도
         self.iter = len(self.train_loader)
         self.epoch = 50
+        self.log = log
 
     def train_epoch(self, epoch):
         self.model.train()
         total_loss = 0
-        pbar = tqdm(enumerate(self.train_loader))
-        for batch_idx, (data, target) in pbar:
+        for batch_idx, (data, target) in tqdm(enumerate(self.train_loader)):
             data = data.cuda()
             target = target.cuda()
             prediction = self.model(data, self.info)
@@ -33,7 +33,7 @@ class Trainer():
             self.optimizer.step()
             total_loss += loss.item()
 
-            log.info(f'epoch{epoch} {batch_idx}/{self.iter} loss: {loss.item()}')
+            self.log.info(f'epoch{epoch} {batch_idx}/{self.iter} loss: {loss.item()}')
 
         return total_loss / self.iter
 
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     log.handlers = []
     log.setLevel(logging.INFO)
     log.addHandler(TqdmLoggingHandler())
-    trainer = Trainer()
+    trainer = Trainer(log)
     trainer.train()
 
 
