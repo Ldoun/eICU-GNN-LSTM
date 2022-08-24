@@ -23,7 +23,8 @@ class Trainer():
     def train_epoch(self, epoch):
         self.model.train()
         total_loss = 0
-        for batch_idx, (data, target) in tqdm(enumerate(self.train_loader)):
+
+        for batch_idx, (data, target) in tqdm(enumerate(self.train_loader), total=self.iter):
             data = data.cuda()
             target = target.cuda()
             prediction = self.model(data, self.info)
@@ -33,7 +34,7 @@ class Trainer():
             self.optimizer.step()
             total_loss += loss.item()
 
-            self.log.info(f'epoch{epoch} {batch_idx}/{self.iter} loss: {loss.item()}')
+            self.log.info(f'epoch {epoch} {batch_idx}/{self.iter} loss: {loss.item()}')
 
         return total_loss / self.iter
 
