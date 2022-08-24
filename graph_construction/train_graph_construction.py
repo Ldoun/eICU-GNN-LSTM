@@ -92,7 +92,7 @@ class Score_Dataset(Dataset):
 def get_dataloader():
     path = '/home/20191650/eICU-GNN-Transformer/data/tuning_hj_graphs'
     diagnosis_data = np.load(Path(path) / 'diagnoses_scores_all.npy', mmap_mode='r')
-    age_data = np.load(Path(path) / 'age_scores_all.npy', mmap_mode='r')
+    age_data = np.load(Path(path) / 'age_scores_all_2.npy', mmap_mode='r')
     gender_data = np.load(Path(path) / 'gender_scores_all.npy', mmap_mode='r')
     #data = torch.stack([diagnosis_data, age_data, gender_data], axis=-1)
 
