@@ -70,32 +70,29 @@ class Graph_Score_Model(nn.Module):
         return torch.sum(y, dim=1)
 
 class Score_Dataset(Dataset):
-    def __init__(self, data, label) -> None:
+    def __init__(self, diagnosis_data, age_data, gender_data, label) -> None:
         super().__init__()
         #self.diagnosis = np.load(Path(path) / 'diagnosis.txt')
-        self.data = data
+        self.diagnosis = diagnosis_data
+        self.age = age_data
+        self.gender = gender_data
         self.label = label
 
     def __len__(self):
         return len(self.data)
 
     def __getitem__(self, index):
-        x = self.data[index]
+        x = np.stack([self.diagnosis[index], self.age[index], self.gender[index]], axis=-1).astype(np.float16)
+        x = torch.Tensor(x)
         #x_info = self.label
         y = self.label[index]
         return x, y
 
 def get_dataloader():
     path = '/home/20191650/eICU-GNN-Transformer/data/tuning_hj_graphs'
-    diagnosis_data = torch.from_numpy(np.load(Path(path) / 'diagnoses_scores_all.npy').astype(np.float16))
-    age_data = torch.from_numpy(np.load(Path(path) / 'age_scores_all.npy').astype(np.float16))
-    data = torch.stack([diagnosis_data,age_data], dim=-1)
-    del diagnosis_data, age_data
-    gc.collect()
-    gender_data = torch.from_numpy(np.load(Path(path) / 'gender_scores_all.npy').astype(np.float16))
-    data = torch.cat([data,gender_data.unsqueeze(-1)],dim=-1)
-    del gender_data
-    gc.collect()
+    diagnosis_data = np.load(Path(path) / 'diagnoses_scores_all.npy', mmap_mode='r')
+    age_data = np.load(Path(path) / 'age_scores_all.npy', mmap_mode='r')
+    gender_data = np.load(Path(path) / 'gender_scores_all.npy', mmap_mode='r')
     #data = torch.stack([diagnosis_data, age_data, gender_data], axis=-1)
 
     Los_data = torch.FloatTensor(pd.read_csv(Path(path) / 'all_labels.csv')['actualiculos'].values)
@@ -108,7 +105,7 @@ def get_dataloader():
     #train_x,valid_x = torch.index_select(data,dim=0,index=indices).split([train_cnt,valid_cnt],dim = 0)
     #train_y,valid_y = torch.index_select(Los_data,dim=0,index= indices).split([train_cnt,valid_cnt],dim = 0)
 
-    train_dataset = Score_Dataset(data, Los_data)
+    train_dataset = Score_Dataset(diagnosis_data, age_data, gender_data, Los_data)
     #valid_dataset = Score_Dataset(valid_x, valid_y)
 
     train_loader = DataLoader(dataset=train_dataset, batch_size=2, shuffle=True)
