@@ -80,7 +80,7 @@ class Score_Dataset(Dataset):
         self.label = label
 
     def __len__(self):
-        return len(self.data)
+        return len(self.label)
 
     def __getitem__(self, index):
         x = np.stack([self.diagnosis[index], self.age[index], self.gender[index]], axis=-1).astype(np.float16)
