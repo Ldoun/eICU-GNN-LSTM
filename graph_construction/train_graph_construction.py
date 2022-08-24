@@ -14,6 +14,7 @@ class Trainer():
         self.train_loader, self.valid_loader = get_dataloader()
         self.lr_scheduler = None #필요할수도
         self.iter = len(self.train_loader)
+        self.epoch = 50
 
     def train_epoch(self, epoch):
         self.model.train()
