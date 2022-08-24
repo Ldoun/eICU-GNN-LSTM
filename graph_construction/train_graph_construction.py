@@ -13,7 +13,7 @@ import gc
 
 class Trainer():
     def __init__(self) -> None:
-        self.model = Graph_Score_Model().half().cuda()
+        self.model = Graph_Score_Model().cuda()
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.001, momentum=0.9)
         self.loss_func = torch.nn.MSELoss()
         self.train_loader, self.info = get_dataloader()
@@ -83,8 +83,8 @@ class Score_Dataset(Dataset):
         return len(self.label)
 
     def __getitem__(self, index):
-        x = np.stack([self.diagnosis[index], self.age[index], self.gender[index]], axis=-1).astype(np.float16)
-        x = torch.Tensor(x)
+        x = np.stack([self.diagnosis[index], self.age[index], self.gender[index]], axis=-1)
+        x = torch.FloatTensor(x)
         #x_info = self.label
         y = self.label[index]
         return x, y
