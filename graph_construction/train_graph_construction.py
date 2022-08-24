@@ -93,7 +93,7 @@ def get_dataloader():
     del diagnosis_data, age_data
     gc.collect()
     gender_data = torch.from_numpy(np.load(Path(path) / 'gender_scores_all.npy').astype(np.float16))
-    data = torch.stack([data,gender_data.unsqueeze(-1)],dim=-1)
+    data = torch.cat([data,gender_data.unsqueeze(-1)],dim=-1)
     del gender_data
     gc.collect()
     #data = torch.stack([diagnosis_data, age_data, gender_data], axis=-1)
