@@ -17,6 +17,7 @@ class Trainer():
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.001, momentum=0.9)
         self.loss_func = torch.nn.MSELoss()
         self.train_loader, self.info = get_dataloader()
+        print('loaded data')
         self.info = self.info.cuda()
         self.lr_scheduler = None #필요할수도
         self.iter = len(self.train_loader)
