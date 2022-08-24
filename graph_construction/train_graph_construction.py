@@ -20,7 +20,7 @@ class Trainer():
         self.lr_scheduler = None #필요할수도
         self.iter = len(self.train_loader)
         self.epoch = 50
-        self.writer = SummaryWriter(f'./logdir/{len(os.listdir())}_exp')
+        self.writer = SummaryWriter(f'./logdir/{len(os.listdir("./logdir"))}_exp')
 
     def train_epoch(self, epoch):
         self.model.train()
