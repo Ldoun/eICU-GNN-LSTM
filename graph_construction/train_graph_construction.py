@@ -8,7 +8,7 @@ import pandas as pd
 
 class Trainer():
     def __init__(self) -> None:
-        self.model = Graph_Score_Model().cuda()
+        self.model = Graph_Score_Model().half().cuda()
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=0.001, momentum=0.9)
         self.loss_func = torch.nn.MSELoss()
         self.train_loader, self.valid_loader = get_dataloader()
