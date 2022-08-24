@@ -91,4 +91,6 @@ def get_dataloader():
     return train_loader, valid_loader
 
 
-
+if __name__ == '__main__':
+    trainer = Trainer()
+    trainer.train()
