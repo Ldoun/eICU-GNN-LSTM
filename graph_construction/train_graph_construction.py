@@ -56,6 +56,10 @@ class Graph_Score_Model(nn.Module):
     def __init__(self) -> None:
         super().__init__()
         self.layer = torch.nn.Linear(3,1,bias=False) 
+        with torch.no_grad():
+            self.layer.weight[0][0].fill_(1)
+            self.layer.weight[0][1].fill_(-1)
+            self.layer.weight[0][2].fill_(1)
 
     def forward(self, x, info):
         x = self.layer(x).squeeze(-1).fill_diagonal_(-np.inf) #(batch, all_patient-1, 3)
