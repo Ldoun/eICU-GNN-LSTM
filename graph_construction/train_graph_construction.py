@@ -8,6 +8,7 @@ import pandas as pd
 import logging
 from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
+import os
 
 class Trainer():
     def __init__(self) -> None:
@@ -19,7 +20,7 @@ class Trainer():
         self.lr_scheduler = None #필요할수도
         self.iter = len(self.train_loader)
         self.epoch = 50
-        self.writer = SummaryWriter('./logdir')
+        self.writer = SummaryWriter(f'./logdir/{len(os.listdir())}_exp')
 
     def train_epoch(self, epoch):
         self.model.train()
