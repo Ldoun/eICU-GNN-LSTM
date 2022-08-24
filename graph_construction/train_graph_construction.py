@@ -73,7 +73,7 @@ def get_dataloader():
     diagnosis_data = np.fill_diagonal(np.load(Path(path) / 'diagnoses_scores_1000.npy').astype(np.float16), -np.inf)
     age_data = np.fill_diagonal(np.load(Path(path) / 'age_scores_1000.npy').astype(np.float16), -np.inf)
     gender_data = np.fill_diagonal(np.load(Path(path) / 'gender_scores_1000.npy').astype(np.float16), -np.inf)
-    data = torch.from_numpy(np.stack([diagnosis_data, age_data, gender_data], axis=-1))
+    data = torch.from_numpy(np.stack([diagnosis_data, age_data, gender_data], axis=-1).astype(np.float16))
 
     Los_data = torch.FloatTensor(pd.read_csv(Path(path) / 'all_labels.csv')['actualiculos'].values)  
 
