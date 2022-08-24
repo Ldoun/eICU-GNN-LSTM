@@ -21,6 +21,7 @@ class Trainer():
         total_loss = 0
         for batch_idx, (data, target, info) in enumerate(self.train_loader):
             data = data.cuda()
+            info = info.cuda()
             target = target.cuda()
             prediction = self.model(data, info)
             loss = self.loss_func(target, prediction)
