@@ -109,7 +109,7 @@ def get_dataloader():
     train_dataset = Score_Dataset(diagnosis_data, age_data, gender_data, Los_data)
     #valid_dataset = Score_Dataset(valid_x, valid_y)
 
-    train_loader = DataLoader(dataset=train_dataset, batch_size=2, shuffle=True)
+    train_loader = DataLoader(dataset=train_dataset, batch_size=32, shuffle=True)
     #valid_loader = DataLoader(dataset=valid_dataset, batch_size=2, shuffle=False)
     return train_loader, Los_data
 
