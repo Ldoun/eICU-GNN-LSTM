@@ -54,8 +54,8 @@ class Graph_Score_Model(nn.Module):
         self.layer = torch.nn.Linear(3,1,bias=False) 
 
     def forward(self, x, info):
-        x = self.layer(x).squeeze(-1) #(batch, all_patient-1, 3)
-        attention_weight = F.softmax(x, dim=-1).fill_diagonal_(-np.inf) #(batch, all_patient-1, 1)
+        x = self.layer(x).squeeze(-1).fill_diagonal_(-np.inf) #(batch, all_patient-1, 3)
+        attention_weight = F.softmax(x, dim=-1) #(batch, all_patient-1, 1)
         y = attention_weight * info #(batch, all_patient-1), (batch, all_patient-1) 
         return torch.sum(y, dim=1)
 
