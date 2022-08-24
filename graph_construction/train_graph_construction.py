@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import logging
 from tqdm import tqdm
+from torch.utils.tensorboard import SummaryWriter
 
 class Trainer():
     def __init__(self) -> None:
@@ -18,6 +19,7 @@ class Trainer():
         self.lr_scheduler = None #필요할수도
         self.iter = len(self.train_loader)
         self.epoch = 50
+        self.writer = SummaryWriter('./logdir')
 
     def train_epoch(self, epoch):
         self.model.train()
@@ -46,7 +48,9 @@ class Trainer():
     def train(self):
         for epoch in range(1, self.epoch+1):
             total_loss = self.train_epoch(epoch)
-            print(f'{epoch}: {total_loss} {self.model.layer.weight[0][0].item()} {self.model.layer.weight[0][1].item()} {self.model.layer.weight[0][2].item()}')
+            self.writer.add_scalar('loss', total_loss, epoch)
+            self.writer.add_scalars('weight', {'alpha':self.model.layer.weight[0][0].item(),'beta':self.model.layer.weight[0][1].item(),'gamma':self.model.layer.weight[0][2].item()}, epoch)
+            #print(f'Epoch {epoch}: {total_loss} {self.model.layer.weight[0][0].item()} {self.model.layer.weight[0][1].item()} {self.model.layer.weight[0][2].item()}')
 
 class Graph_Score_Model(nn.Module):
     def __init__(self) -> None:
