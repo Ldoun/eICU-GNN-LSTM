@@ -59,7 +59,7 @@ class Score_Dataset(Dataset):
         self.label = label
 
     def __len__(self):
-        return len(self.gender)
+        return len(self.data)
 
     def __getitem__(self, index):
         x = self.dat[index]
