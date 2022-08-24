@@ -19,7 +19,7 @@ class Trainer():
     def train_epoch(self, epoch):
         self.model.train()
         total_loss = 0
-        for batch_idx, (data, target) in enumerate(self.iter):
+        for batch_idx, (data, target) in enumerate(self.train_loader):
             data = data.cuda()
             target = target.cuda()
             prediction = self.model(data)
