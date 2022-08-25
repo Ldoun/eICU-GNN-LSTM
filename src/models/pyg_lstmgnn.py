@@ -59,13 +59,16 @@ class NsLstmGNN(torch.nn.Module):
         print('Got all LSTM output.')
         return lstm_outs, lasts, lstm_ys
 
-    def inference(self, x_all, flat_all, edge_weight, ts_loader, subgraph_loader, device, get_emb=False):
+    def inference(self, x_all, flat_all, edge_weight, ts_loader, subgraph_loader, device, get_emb=False, is_gat=False):
         # first collect lstm outputs by minibatching:
         lstm_outs, last_all, lstm_ys = self.infer_lstm_by_batch(ts_loader, device)
 
         # then pass lstm outputs to gnn
         x_all = lstm_outs
-        out = self.gnn_encoder.inference(x_all, flat_all, subgraph_loader, device, edge_weight, last_all, get_emb=get_emb)[0]
+        out = self.gnn_encoder.inference(x_all, flat_all, subgraph_loader, device, edge_weight, last_all, get_emb=get_emb)
+        
+        if is_gat:
+            out = out[0]
 
         out = self.last_act(out)
 
