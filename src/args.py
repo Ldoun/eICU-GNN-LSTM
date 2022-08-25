@@ -212,6 +212,8 @@ def init_transformergnn_args():
     parser = init_gnn_args(parser)
     parser = init_lstm_args(parser)
     parser.add_argument('--lg_alpha', type=float, default=1)
+    parser.add_argument('--fp_attn_transformer', action='store_true', help='forward pass to get attention weights (for Transforemer)')
+
     return parser
 
 

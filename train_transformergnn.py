@@ -430,7 +430,6 @@ if __name__ == '__main__':
     parser.add_argument('--fp_emb', action='store_true', help='forward pass to get embeddings')
     parser.add_argument('--fp_logits', action='store_true', help='forward pass to get logits')
     parser.add_argument('--fp_attn', action='store_true', help='forward pass to get attention weights (for GAT)')
-    parser.add_argument('--fp_attn_transformer', action='store_true', help='forward pass to get attention weights (for Transforemer)')
     config = parser.parse_args()
     config.model = 'transformergnn'
     config = add_configs(config)
