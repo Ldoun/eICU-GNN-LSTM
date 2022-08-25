@@ -3,7 +3,7 @@ from ray import tune
 from ray.tune import CLIReporter
 from functools import partial
 from ray.tune.schedulers import ASHAScheduler
-from src.hyperparameters.best_parameters import transformergnn#ns_gnn_2d, ns_gnn_4, dynamic, lstmgnn
+#from src.hyperparameters import ns_gnn_2d, ns_gnn_4, dynamic, lstmgnn
 
 
 class ihm_TuneReportCallback(Callback):
@@ -43,12 +43,6 @@ transformer_grid = {
     "n_head": tune.choice([1,2,5,10]),
     "transformer_dropout": tune.uniform(0, 0.5),
     "num_layers": tune.choice([1,2,3,4,5]),
-}
-
-create_graph_grid = {
-    "alpha": tune.uniform(0, 100),
-    "beta": tune.uniform(0, 100),
-    "gamma": tune.uniform(-100, 0)
 }
 
 gnn_specific_grid = {
@@ -91,39 +85,34 @@ gnn_specific_grid = {
 
 
 def main_tune(tune_function, config):
-    parameter_columns = []
-    if config['tune_graph']:
-        for key, value in create_graph_grid.items():
+    parameter_columns = ['lr', 'l2', 'main_dropout']
+
+    for key, value in all_grid.items():
+        config[key] = value
+    
+    if config['model'] == 'lstm':
+        pass
+
+    elif config['dynamic_g']:
+        gnn_grid = gnn_specific_grid[config['gnn_name']]
+        for key, value in gnn_grid.items():
+            if ('ns_size' not in key):
+                config[key] = value
+                parameter_columns.append(key)
+
+    elif 'gnn' in config['model']: # lstmgnn / ns_gnn
+        for key, value in nsgnn_grid.items():
             config[key] = value
             parameter_columns.append(key)
-    else:
-        parameter_columns.extend(['lr', 'l2', 'main_dropout'])
-        for key, value in all_grid.items():
+        gnn_grid = gnn_specific_grid[config['gnn_name']]
+        for key, value in gnn_grid.items():
             config[key] = value
-        
-        if config['model'] == 'lstm':
-            pass
+            parameter_columns.append(key)
 
-        elif config['dynamic_g']:
-            gnn_grid = gnn_specific_grid[config['gnn_name']]
-            for key, value in gnn_grid.items():
-                if ('ns_size' not in key):
-                    config[key] = value
-                    parameter_columns.append(key)
-
-        elif 'gnn' in config['model']: # lstmgnn / ns_gnn
-            for key, value in nsgnn_grid.items():
-                config[key] = value
-                parameter_columns.append(key)
-            gnn_grid = gnn_specific_grid[config['gnn_name']]
-            for key, value in gnn_grid.items():
-                config[key] = value
-                parameter_columns.append(key)
-
-        if 'transformer' in config['model']:
-            for key, value in transformer_grid.items():
-                config[key] = value
-                parameter_columns.append(key)
+    if 'transformer' in config['model']:
+        for key, value in transformer_grid.items():
+            config[key] = value
+            parameter_columns.append(key)
     
     if config['fix_g_params'] or config['fix_l_params']: #fix params
         if config['dynamic_g']:
@@ -135,8 +124,6 @@ def main_tune(tune_function, config):
                 best_params = ns_gnn_2d[config['task']][config['gnn_name']]
             elif '4' in config['g_version']:
                 best_params = ns_gnn_4[config['task']][config['gnn_name']]
-        elif config['model'] == 'transformergnn':
-            best_params = transformergnn[config['task']][config['gnn_name']]
         else:
             print(config['model'], config['dynamic_g'], config['g_version'])
         # fixing the values 
