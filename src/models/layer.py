@@ -350,7 +350,7 @@ class MultiheadAttention(Module):
                         out_proj_weight, out_proj_bias)
             if any([type(t) is not Tensor for t in tens_ops]) and has_torch_function(tens_ops):
                 return handle_torch_function(
-                    multi_head_attention_forward, tens_ops, query, key, value,
+                    self.multi_head_attention_forward, tens_ops, query, key, value,
                     embed_dim_to_check, num_heads, in_proj_weight, in_proj_bias,
                     bias_k, bias_v, add_zero_attn, dropout_p, out_proj_weight,
                     out_proj_bias, training=training, key_padding_mask=key_padding_mask,
