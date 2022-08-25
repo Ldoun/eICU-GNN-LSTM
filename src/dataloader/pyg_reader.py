@@ -72,7 +72,7 @@ def read_graph_edge_list(graph_dir, version,tuning_version=''):
     """
     return edge lists, and edge similarity scores from specified graph.
     """
-    version2filename = {'default': 'k_closest_{}_k=3_adjusted_ns.txt'}
+    version2filename = {'default': 'final_k_closest_{}_k=3_adjusted.txt'}
 
     file_name = tuning_version+version2filename[version]
     u_path = Path(graph_dir) / file_name.format('u')
