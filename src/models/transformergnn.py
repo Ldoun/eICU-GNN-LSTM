@@ -102,9 +102,9 @@ class TransformerGNN(torch.nn.Module):
         x_all = transformer_outs
         out = self.gnn_encoder.inference(x_all, flat_all, subgraph_loader, device, edge_weight, last_all, get_emb=get_emb)
 
-        out = self.last_act(out)
         if is_gat:
             out = out[0]
+        out = self.last_act(out)
 
         if get_attention:
             return input_with_attention
