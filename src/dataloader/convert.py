@@ -10,7 +10,7 @@ def convert_timeseries_into_mmap(data_dir, save_dir, n_rows=100000, freq=1):
     """
     input_size = pd.read_csv(Path(data_dir) / 'test' / 'timeseries.csv', nrows=100).shape[1]
     save_path = Path(save_dir) / 'ts.dat'
-    shape = (n_rows, 24*freq, input_size -1 )
+    shape = (n_rows, 24*freq, input_size -1)
     write_file = np.memmap(save_path, dtype=np.float32, mode='w+', shape=shape)
     ids = []
     n = 0

@@ -158,3 +158,25 @@ The following runs a hyperparameter search.
 ```
 python3 -m src.hyperparameters.lstm_search --bilstm --ts_mask --add_flat --class_weights --num_workers 0 --add_diag
 ```
+
+## Experiments
+For AUROC, AUPRC, R2 and Kappa, higher is better, whereas for MAD, MAPE, MSE and MSLElower is better.
+### LOS
+|model|transformer pooling|graph|R^2|Kappa|MAD|MAPE|MSE|MSLE|desc|
+|---|---|---|---|---|---|---|---|---|---|
+|sage|last|diagnosis|0.1568685505|0.2997412595|1.842767835|48.72174263|13.78356838|0.365208447||
+|sage|mean|diagnosis|0.1351010316650204|0.2731497260493886|1.844735026359558|48.46992790699005|14.139425277709961|0.3668326735496521||
+|sage|first|diagnosis|0.06831062749600969|0.1721273163384892|1.9602397680282593|54.19719219207764|15.231319427490234|0.4172707200050354|trun_normal 정규분포|
+|sage|first|diagnosis|0.062358813847370076|0.17355661430763536|1.95356285572052|52.88519263267517|15.328619003295898|0.4172242283821106|cls token initialized with 0|
+|sage|last|d+g+a|0.1508147479078733|0.28964295133671125|1.8461366891860962|49.04422163963318|13.882536888122559|0.36511972546577454|
+
+### IHM
+|model|transformer pooling|graph|auroc|auprc|
+|---|---|---|---|---|
+|gat|last|d+g+a|0.852758461140205|0.4445937915410134|
+|sage|last|d+g+a|0.8520737888234906|0.443527614167012|
+|sage|last|diagnosis|0.8523954506|0.4441407866|
+|gat|last|diagnosis|0.8568646078|0.4622707585|
+
+
+
