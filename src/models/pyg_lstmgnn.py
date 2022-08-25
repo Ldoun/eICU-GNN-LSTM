@@ -65,7 +65,7 @@ class NsLstmGNN(torch.nn.Module):
 
         # then pass lstm outputs to gnn
         x_all = lstm_outs
-        out = self.gnn_encoder.inference(x_all, flat_all, subgraph_loader, device, edge_weight, last_all, get_emb=get_emb)
+        out = self.gnn_encoder.inference(x_all, flat_all, subgraph_loader, device, edge_weight, last_all, get_emb=get_emb)[0]
 
         out = self.last_act(out)
 
