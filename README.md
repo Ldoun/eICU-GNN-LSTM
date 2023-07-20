@@ -53,6 +53,8 @@ Red → Performance from the previous research
 - development of the Transformer
 - Training process of the whole model
 - Establishing an Experimental Environment
+
+``` 
 @misc{rocheteautong2021,
       title={Predicting Patient Outcomes with Graph Representation Learning}, 
       author={Emma Rocheteau and Catherine Tong and Petar Veličković and Nicholas Lane and Pietro Liò},
