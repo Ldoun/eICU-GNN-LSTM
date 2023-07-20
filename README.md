@@ -39,7 +39,7 @@ when making clinical judgments
 ![image2](./result.png)
 
 - We outperformed previous research using Our eICU-GNN-Transformer.
-        - during the creation of the graph, we had questions about data leakage. The problem point was the calculation of the coefficients of gender and age. we calculated coefficients using a simple regression algorithm using the length of the stay, which was one of the labels.
+    - during the creation of the graph, we had questions about data leakage. The problem point was the calculation of the coefficients of gender and age. we calculated coefficients using a simple regression algorithm using the length of the stay, which was one of the labels.
 But I don't think this is a data leakage. Because we calculated these coefficients from training data only and used this value for selecting top-k similar patients for Graph creation later
 - Blue → hyperparameter tuned result
 Green → non-hyper parameter tuned result
